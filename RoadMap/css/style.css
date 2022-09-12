@@ -1,0 +1,16 @@
+.nav{
+  margin: 0 10px;
+  list-style: none;
+  text-align: center;
+}
+.nav .nav-li{
+  display: inline-block;
+  padding: 5px 7px;
+}
+.icon-view{
+  display: flex !important;
+  align-items: center;
+}
+.icon-view .img{
+  width: 30px;
+}
