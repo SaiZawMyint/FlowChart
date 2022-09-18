@@ -1,11 +1,13 @@
 import { reactive } from "vue";
 
 const map = reactive({
-    title: "",
+    title: "Hello",
     description: "",
     link: ""
 });
 
+const data = [{title: "Vue",description: "Learn Vue Frontend Framework",link:"https:/vuejs.org"}];
 export default{
-    map
+    map,
+    data
 }

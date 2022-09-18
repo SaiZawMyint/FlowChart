@@ -5,4 +5,4 @@ import './assets/main.css'
 import './assets/css/common.css'
 import './assets/css/style.css'
 
-createApp(App).mount('#app')
+createApp(App).mount('#contents')

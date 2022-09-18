@@ -14,3 +14,16 @@
 .icon-view .img{
   width: 30px;
 }
+.contents{
+  padding: 80px 0 50px;
+}
+.map-tit{
+  list-style: none;
+  text-align: center;
+}
+.map-tit li{
+  display: inline-block;
+  padding: 10px;
+  background-color: aquamarine;
+  border-radius: 5px;
+}

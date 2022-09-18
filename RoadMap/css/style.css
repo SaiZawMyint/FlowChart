@@ -14,3 +14,6 @@
 .icon-view .img{
   width: 30px;
 }
+.contents{
+  overflow: hidden;
+}
