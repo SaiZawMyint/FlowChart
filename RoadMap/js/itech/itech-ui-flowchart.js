@@ -47,11 +47,24 @@ class FlowChart {
         this.setting = Object.assign({}, setting);
         this.components = []
         this.addSvg();
-        
+        this.defaultJoinSetting = {
+            current: {
+                comp: null,
+                direction: 'top' | 'left' | 'bottom' | 'right'
+            },
+            target: {
+                comp: null,
+                direction: 'top' | 'left' | 'bottom' | 'right'
+            },
+            connector: {
+                type: 'line'
+            }
+        }
+
     }
-    init(element,setting) {
+    init(element, setting) {
         this.element = element ? element : this.element
-        this.setting = setting ? Object.assign({},setting): this.setting
+        this.setting = setting ? Object.assign({}, setting) : this.setting
         this.element.css({
             position: "relative",
             height: "600px",
@@ -127,17 +140,17 @@ class FlowChart {
             comp.drag();
         comp.context([
             {
-                name: "Copy",key: "Ctrl + C", callback: function (data) {
+                name: "Copy", key: "Ctrl + C", callback: function (data) {
                     console.log(data)
                 }
             },
             {
-                name: "Cut",key: "Ctrl + X", callback: function (data) {
+                name: "Cut", key: "Ctrl + X", callback: function (data) {
                     console.log(data)
                 }
             },
             {
-                name: "Paste",key: "Ctrl + V", callback: function (data) {
+                name: "Paste", key: "Ctrl + V", callback: function (data) {
                     console.log(data)
                 }
             }
@@ -147,29 +160,18 @@ class FlowChart {
         }
         this.element.appendChild(comp.getComponent)
         this.components.push(comp)
-        setting.callback({ target: this, setting: setting , initiatedComponent: comp})
-        return { target: this, setting: setting , initiatedComponent: comp}
+        setting.callback({ target: this, setting: setting, initiatedComponent: comp })
+        return { target: this, setting: setting, initiatedComponent: comp }
     }
 
-    joinTo(setting = {
-        current: {
-            comp: null,
-            direction: 'top' | 'left' | 'bottom' | 'right'
-        },
-        target: {
-            comp: null,
-            direction: 'top' | 'left' | 'bottom' | 'right'
-        },
-        connector: {
-            type: 'line'
-        }
-    }) {
+    joinTo(setting = this.defaultJoinSetting) {
+        setting = new FObject(this.defaultJoinSetting).filterObject(setting)
         var point = new JOIN().getJoinablePoint(setting);
-        console.log(point, this.svgelement)
         let x = `M ${point.startPoint.x}, ${point.startPoint.y} L ${point.endPoint.x} ${point.endPoint.y}`;
         let path = this.svgelement.drawPath(x);
-        console.log(path)
-        path.svg.id = "p_"+setting.current.comp.id+"-"+setting.target.comp.id;
+        path.attrs({"data-connector":setting.connector.type})
+        path.svg.id = "p_" + setting.current.comp.id + "-" + setting.target.comp.id;
+
     }
 
     get size() {
@@ -260,7 +262,7 @@ class Component {
             this.css(compTarget.hoverProps.org);
         })
     }
-    context(menus = [{ name: 'name',key: "", callback: callback }]) {
+    context(menus = [{ name: 'name', key: "", callback: callback }]) {
         this.component.addEventListener('contextmenu', function (e) {
             e.preventDefault();
             var x = e.clientX;
@@ -314,7 +316,6 @@ class Component {
             e = e || window.event;
             e.preventDefault();
             document.onmouseup = closeDragElement;
-            // call a function whenever the cursor moves:
             document.onmousemove = elementDrag;
         }
 
@@ -323,6 +324,7 @@ class Component {
             e = e || window.event;
             e.preventDefault();
             //calculate position
+            searchJoins(elmnt)
             elmnt.style.top = ((e.clientY - elmnt.offsetTop) + (elmnt.offsetTop - (elmnt.offsetHeight / 2))) + "px";
             elmnt.style.left = ((e.clientX - elmnt.offsetLeft) + (elmnt.offsetLeft)) + "px";
             restoreHoverProps(elmnt.style.top, elmnt.style.left)
@@ -333,7 +335,18 @@ class Component {
             document.onmouseup = null;
             document.onmousemove = null;
         }
-
+        function searchJoins(ele) {
+            for(let i = 0; i < ele.children.length; i++){
+                let child = ele.children[i]
+                if(child.classList.contains("_join_component")){
+                    if(child.hasAttribute('data-jp-current')){
+                        JOIN.change(child.getAttribute('data-jp-current'),child,true)
+                    }else if(child.hasAttribute('data-jp-target')){
+                        JOIN.change(child.getAttribute('data-jp-target'),child,false)
+                    }
+                }
+            }
+        }
         function restoreHoverProps(top, left) {
             if ('top' in component.hoverProps.org) {
                 component.hoverProps.org.top = top
@@ -390,17 +403,31 @@ class JOIN {
         var target = setting.target.comp
         var cdir = setting.current.direction
         var tdir = setting.target.direction
-        
+
         var joinc = this.getDirectionSelector(component, cdir);
         var joint = this.getDirectionSelector(target, tdir);
+        var id = "p_" + setting.current.comp.id + "-" + setting.target.comp.id;
+
+        addRelationRef(id,joinc,true)
+        addRelationRef(id, joint, false)
 
         var rectc = joinc.getBoundingClientRect();
         var rectt = joint.getBoundingClientRect();
 
-        var sx = this.getOffset(rectc, 'left')
-        var sy = this.getOffset(rectc, 'top')
-        var ex = this.getOffset(rectt, 'left')
-        var ey = this.getOffset(rectt, 'top')
+        var sx = JOIN.getOffset(rectc, 'left')
+        var sy = JOIN.getOffset(rectc, 'top')
+        var ex = JOIN.getOffset(rectt, 'left')
+        var ey = JOIN.getOffset(rectt, 'top')
+
+        function addRelationRef(id, joinc, opt) {
+            var val = id;
+            var t = opt?"data-jp-current":"data-jp-target"
+            var existing = joinc.getAttribute(t);
+            if (existing != null) {
+                val = existing+" "+id
+            }
+            joinc.setAttribute(t,val);
+        }
 
         return {
             startPoint: {
@@ -413,13 +440,54 @@ class JOIN {
             }
         }
     }
-    getOffset(rect,direction) {
-        
-        if(direction == 'left') return rect.left + rect.width
-        if(direction == 'top') return rect.top + rect.height
+    static getOffset(rect, direction) {
+        if (direction == 'left') return rect.left + rect.width
+        if (direction == 'top') return rect.top + rect.height
     }
     getDirectionSelector(current = new HTMLElement(), currentdir) {
         return (document.querySelectorAll("#" + current.id + " [data-join_" + currentdir + "]")[0])
+    }
+    static change(idLists,target,opt){
+        var ids = [];
+        if(idLists.includes(" ")){
+            var split = idLists.split(" ");
+            ids = split.filter(s=>s.length > 0);
+        }else{
+            ids = [idLists]
+        }
+        const rect = target.getBoundingClientRect()
+        
+        ids.forEach(id=>{
+            var t = document.getElementById(id)
+            var path = t.hasAttribute("d")?t.getAttribute("d"):"";
+            var connectorType = t.hasAttribute('data-connector')?
+                                    t.getAttribute('data-connector'): "line"
+            let newPdata = analysePath(rect ,path ,connectorType,opt)
+            console.log(newPdata);
+            t.setAttribute("d",newPdata)
+        })
+        function analysePath(rect,path,type,opt){
+            const top = JOIN.getOffset(rect, 'top')
+            const left = JOIN.getOffset(rect,'left')
+            let rx = left - (rect.width / 2)
+            let ry = top - (rect.height / 2)
+            return updatePos(rx,ry,type,path,opt);
+        }
+        function updatePos(x,y,type,path,opt){
+            var parsePath = SVG.parsePath(type,path);
+            var p = parsePath.lineStart
+            var sp = parsePath.lineEnd
+            console.log(sp)
+            if(opt){
+                p[1] = x+",";
+                p[2] = y
+            }else{
+                sp[1] = x+", "
+                sp[2] = y
+            }
+
+            return p[0]+" "+p[1]+" "+p[2]+" "+sp[0]+" "+sp[1]+" "+sp[2];
+        }
     }
 }
 
@@ -456,11 +524,38 @@ class SVG {
     drawPath(pathData) {
         var svg = new SVG();
         var path = svg.create('path');
-        path.attrNs({ "stroke": "red","stroke-width":"3", "d": pathData});
+        path.attrNs({ "stroke": "red", "stroke-width": "3", "d": pathData });
         this.svg.appendChild(path.svg);
         return path;
     }
-    
+
+    static parsePath(type,path){
+        if(type == 'line'){
+            const symbols = ['M','L']
+            path = path.trim()
+            symbols.forEach(sym=>{
+                if(!path.includes(sym)) throw new Error("Invalid path");
+            })
+            var pdata = path.split(/\s/g);
+            var startData = [], endData = []
+            var savingStart = false, savingEnd = false
+            pdata.forEach(pd=>{
+                if(pd.trim() == symbols[0]){
+                    savingStart = true
+                    savingEnd = false
+                }else if(pd.trim() == symbols[1]){
+                    savingEnd = true
+                    savingStart = false
+                }
+                if(savingStart) startData.push(pd);
+                if(savingEnd) endData.push(pd)
+            })
+            return {
+                lineStart: startData,
+                lineEnd: endData
+            }
+        }
+    }
 }
 
 

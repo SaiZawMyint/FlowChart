@@ -26,7 +26,7 @@ ready(function () {
             "left": "30%"
         }
     })
-    itech(element).flowchart().joins(component1,component2)
-    itech(element).flowchart().joins(component1,component3,{current: 'bottom',target: 'top'})
+    itech(element).flowchart().joins(component1,component2,{current: 'right',target: 'top'})
+    itech(element).flowchart().joins(component1,component3,{current: 'left',target: 'top'})
     
 });
