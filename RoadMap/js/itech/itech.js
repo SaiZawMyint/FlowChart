@@ -33,10 +33,10 @@ window.itech = function (selector) {
                     return itechFlowchart.createComponent(setting).initiatedComponent
                     
                 },
-                joins: function(comp1,comp2,edge = {current: 'bottom',target: 'top'}){
+                joins: function(comp1,comp2,edge = {current: 'bottom',target: 'top'},css,connectorType){
                     var cdir = 'current' in edge ? edge.current: 'bottom'
                     var tdir = 'target' in edge ? edge.target: 'top'
-                    itechFlowchart.joinTo({
+                    var joinsetting = {
                         current: {
                             comp: comp1.getComponent,
                             direction: cdir
@@ -44,8 +44,18 @@ window.itech = function (selector) {
                         target: {
                             comp: comp2.getComponent,
                             direction: tdir
+                        },
+                        connector: {
+                            type: 'line'
+                        },
+                        css:{
+                            size: 2,
+                            color: "blue"
                         }
-                    })
+                    }
+                    css ? joinsetting.css = css:null
+                    connectorType ? joinsetting.connector.type = connectorType:null
+                    itechFlowchart.joinTo(joinsetting)
                 }
             }
         },
@@ -155,11 +165,9 @@ class IEvent{
     }
     on(element, events, handler, usedCapture, args){
         var evt = this.analyseEvts(events)
-        var callback = function(e){
-            handler.apply(this, args && args instanceof Array ? args: [])
-        }
         evt.forEach((e)=>{
-            element.addEventListener(e,callback,usedCapture)
+            console.log(handler)
+            element.addEventListener(e,handler,usedCapture)
         });
     }
     analyseEvts(events){

@@ -58,6 +58,10 @@ class FlowChart {
             },
             connector: {
                 type: 'line'
+            },
+            css:{
+                size: 2,
+                color: "blue"
             }
         }
 
@@ -156,7 +160,7 @@ class FlowChart {
             }
         ]);
         if (setting.joinPoint) {
-            this.component.addJoinPoint(comp, setting.joinPoint);
+            comp.addJoinPoint(setting.joinPoint);
         }
         this.element.appendChild(comp.getComponent)
         this.components.push(comp)
@@ -168,7 +172,7 @@ class FlowChart {
         setting = new FObject(this.defaultJoinSetting).filterObject(setting)
         var point = new JOIN().getJoinablePoint(setting);
         let x = `M ${point.startPoint.x}, ${point.startPoint.y} L ${point.endPoint.x} ${point.endPoint.y}`;
-        let path = this.svgelement.drawPath(x);
+        let path = this.svgelement.drawPath(x,setting.css);
         path.attrs({"data-connector":setting.connector.type})
         path.svg.id = "p_" + setting.current.comp.id + "-" + setting.target.comp.id;
 
@@ -197,6 +201,12 @@ class Component {
             prop: {}
         };
         this.id = window.compId++;
+        this.joinBtns = {
+            top: null,
+            left: null,
+            right: null,
+            bottom: null
+        }
     }
     create(tag = "div", join = false) {
         this.component = document.createElement(tag);
@@ -209,11 +219,18 @@ class Component {
     }
     addText(text) {
         this.component.innerHTML = `<span style="user-select:none;">${text}</span>`;
+        var target = this.component
         this.component.firstElementChild.addEventListener('focus', function (e) {
             e.stopPropagation();
             this.contentEditable = true
             window.prevents.component.isRename = true
             console.log(prevents.component.isRename)
+        })
+        this.component.firstElementChild.addEventListener('input',function(){
+            JOIN.searchJoins(target);
+        })
+        this.component.firstElementChild.addEventListener('mousedown',function(e){
+            if(window.prevents.component.isRename) e.stopPropagation();
         })
         this.component.firstElementChild.addEventListener('blur', function (e) {
             e.stopPropagation();
@@ -226,10 +243,10 @@ class Component {
     rename(opt = true, name = this.getComponent.innerText) {
         if (opt) {
             this.getComponent.addEventListener('dblclick', function (e) {
+                if(!window.prevents.component.isRename) placeCaretAtEnd(this.firstElementChild)
                 this.firstElementChild.contentEditable = true;
                 this.firstElementChild.css({ cursor: "text" })
-                this.firstElementChild.focus()
-                placeCaretAtEnd(this.firstElementChild)
+                this.firstElementChild.focus()  
             })
         }
         function placeCaretAtEnd(el) {
@@ -324,7 +341,7 @@ class Component {
             e = e || window.event;
             e.preventDefault();
             //calculate position
-            searchJoins(elmnt)
+            JOIN.searchJoins(elmnt)
             elmnt.style.top = ((e.clientY - elmnt.offsetTop) + (elmnt.offsetTop - (elmnt.offsetHeight / 2))) + "px";
             elmnt.style.left = ((e.clientX - elmnt.offsetLeft) + (elmnt.offsetLeft)) + "px";
             restoreHoverProps(elmnt.style.top, elmnt.style.left)
@@ -332,20 +349,9 @@ class Component {
 
         function closeDragElement() {
             /* stop moving when mouse button is released:*/
+            JOIN.searchJoins(elmnt)
             document.onmouseup = null;
             document.onmousemove = null;
-        }
-        function searchJoins(ele) {
-            for(let i = 0; i < ele.children.length; i++){
-                let child = ele.children[i]
-                if(child.classList.contains("_join_component")){
-                    if(child.hasAttribute('data-jp-current')){
-                        JOIN.change(child.getAttribute('data-jp-current'),child,true)
-                    }else if(child.hasAttribute('data-jp-target')){
-                        JOIN.change(child.getAttribute('data-jp-target'),child,false)
-                    }
-                }
-            }
         }
         function restoreHoverProps(top, left) {
             if ('top' in component.hoverProps.org) {
@@ -361,24 +367,36 @@ class Component {
      * @param {Component} element 
      * @param {{x:String}: Object} points 
      */
-    addJoinPoint(element, points = { top: true, left: true, right: true, bottom: true, size: 10, circle: true, rect: false }) {
-        var top = points.top ? this.create('span', true).css(Design.Data.joinBtn('top', { width: points.size, height: points.size })).component : null;
-        var left = points.left ? this.create('span', true).css(Design.Data.joinBtn('left', { width: points.size, height: points.size })).component : null;
-        var right = points.right ? this.create('span', true).css(Design.Data.joinBtn('right', { width: points.size, height: points.size })).component : null;
-        var bottom = points.bottom ? this.create('span', true).css(Design.Data.joinBtn('bottom', { width: points.size, height: points.size })).component : null;
+    addJoinPoint(points = { top: true, left: true, right: true, bottom: true, size: 10, circle: true, rect: false }) {
+        var top = points.top ? new Component().create('span', true).css(Design.Data.joinBtn('top', { width: points.size, height: points.size })).component : null;
+        var left = points.left ? new Component().create('span', true).css(Design.Data.joinBtn('left', { width: points.size, height: points.size })).component : null;
+        var right = points.right ? new Component().create('span', true).css(Design.Data.joinBtn('right', { width: points.size, height: points.size })).component : null;
+        var bottom = points.bottom ? new Component().create('span', true).css(Design.Data.joinBtn('bottom', { width: points.size, height: points.size })).component : null;
 
         top != null ? top.dataset['join_top'] = "true" : null
         left != null ? left.dataset['join_left'] = "true" : null
         right != null ? right.dataset['join_right'] = "true" : null
         bottom != null ? bottom.dataset['join_bottom'] = "true" : null
-
+        console.log(bottom)
         bottom.addEventListener('mousedown', function (e) {
             e.stopPropagation()
         })
-        top != null ? element.component.appendChild(top) : null
-        left != null ? element.component.appendChild(left) : null
-        right != null ? element.component.appendChild(right) : null
-        bottom != null ? element.component.appendChild(bottom) : null
+        top != null ? this.getComponent.appendChild(top) : null
+        left != null ? this.getComponent.appendChild(left) : null
+        right != null ? this.getComponent.appendChild(right) : null
+        bottom != null ? this.getComponent.appendChild(bottom) : null
+
+        this.joinBtns.top = top
+        this.joinBtns.left = left
+        this.joinBtns.right = right
+        this.joinBtns.bottom = bottom
+    }
+    select(){
+        this.component.css({"box-shadow":"inset 0 0 0 2px #6c6c6c"})
+        this.joinBtns.top.css({"background-color":"#FFF","box-shadow":"0 0 0 1px #333"})
+        this.joinBtns.left.css({"background-color":"#FFF","box-shadow":"0 0 0 1px #333"})
+        this.joinBtns.right.css({"background-color":"#FFF","box-shadow":"0 0 0 1px #333"})
+        this.joinBtns.bottom.css({"background-color":"#FFF","box-shadow":"0 0 0 1px #333"})
     }
     get getComponent() {
         return this.component
@@ -440,6 +458,18 @@ class JOIN {
             }
         }
     }
+    static searchJoins(ele) {
+        for(let i = 0; i < ele.children.length; i++){
+            let child = ele.children[i]
+            if(child.classList.contains("_join_component")){
+                if(child.hasAttribute('data-jp-current')){
+                    JOIN.change(child.getAttribute('data-jp-current'),child,true)
+                }else if(child.hasAttribute('data-jp-target')){
+                    JOIN.change(child.getAttribute('data-jp-target'),child,false)
+                }
+            }
+        }
+    }
     static getOffset(rect, direction) {
         if (direction == 'left') return rect.left + rect.width
         if (direction == 'top') return rect.top + rect.height
@@ -463,7 +493,6 @@ class JOIN {
             var connectorType = t.hasAttribute('data-connector')?
                                     t.getAttribute('data-connector'): "line"
             let newPdata = analysePath(rect ,path ,connectorType,opt)
-            console.log(newPdata);
             t.setAttribute("d",newPdata)
         })
         function analysePath(rect,path,type,opt){
@@ -477,7 +506,6 @@ class JOIN {
             var parsePath = SVG.parsePath(type,path);
             var p = parsePath.lineStart
             var sp = parsePath.lineEnd
-            console.log(sp)
             if(opt){
                 p[1] = x+",";
                 p[2] = y
@@ -521,10 +549,10 @@ class SVG {
         }
         return this;
     }
-    drawPath(pathData) {
+    drawPath(pathData,css) {
         var svg = new SVG();
         var path = svg.create('path');
-        path.attrNs({ "stroke": "red", "stroke-width": "3", "d": pathData });
+        path.attrNs({ "stroke": css.color, "stroke-width": css.size, "d": pathData });
         this.svg.appendChild(path.svg);
         return path;
     }
@@ -550,6 +578,8 @@ class SVG {
                 if(savingStart) startData.push(pd);
                 if(savingEnd) endData.push(pd)
             })
+            startData = startData.filter(sd=>sd.trim().length > 0)
+            endData = endData.filter(ed=>ed.trim().length > 0)
             return {
                 lineStart: startData,
                 lineEnd: endData

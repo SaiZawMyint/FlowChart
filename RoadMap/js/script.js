@@ -6,7 +6,11 @@ ready(function () {
         id: "mycomponent1",
         css: {
             "color": "#FFF",
-            "top": "100px"
+            "top": "100px",
+            "left": "50%"
+        },
+        callback: function(data){
+            data.initiatedComponent.select();
         }
     })
     var component2 = itech(element).flowchart().add({
@@ -14,7 +18,8 @@ ready(function () {
         id: "mycomponent2",
         css: {
             "color": "#FFF",
-            "top": "200px"
+            "top": "200px",
+            "left":"50%"
         }
     })
     var component3 = itech(element).flowchart().add({
@@ -26,7 +31,25 @@ ready(function () {
             "left": "30%"
         }
     })
-    itech(element).flowchart().joins(component1,component2,{current: 'right',target: 'top'})
+    var component4 = itech(element).flowchart().add({
+        title: "My Component 4",
+        id: "mycomponent3",
+        css: {
+            "color": "#FFF",
+            "top": "200px",
+            "left": "30px"
+        }
+    })
+    var component5 = itech(element).flowchart().add({
+        title: "My Component 5",
+        id: "mycomponent3",
+        css: {
+            "color": "#FFF",
+            "top": "100px",
+            "left": "70%"
+        }
+    })
+    itech(element).flowchart().joins(component1,component2,{current: 'bottom',target: 'top'},{size: 2, color: "red"}, 'line')
     itech(element).flowchart().joins(component1,component3,{current: 'left',target: 'top'})
-    
+    itech(element).flowchart().joins(component2,component3,{current: 'left', target: "right"})
 });
