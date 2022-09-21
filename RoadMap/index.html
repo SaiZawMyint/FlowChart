@@ -10,13 +10,51 @@
 </head>
 <body>
     <div class="wrapper">
+
         <div class="contents" id="flowChart">
+            <div class="btn-field">
+                <button class="btn">Add Component</button>
+            </div>
+            
         </div>
         <!-- /.contents -->
         <footer class="footer"></footer>
         <!-- /.footer -->
     </div>
     <!-- /.wrapper -->
+    <div class="modal-field">
+        <div class="modal-box">
+            <div class="modal-head">Add Component</div>
+            <div class="modal-body flex flex-column">
+                <div class="forms flex center">
+                    <div class="inp-field">
+                        <input type="text" class="inp" placeholder="Component's Name">
+                    </div>
+                    
+                </div>
+                <div class="forms flex center">
+                    <div class="inp-field">
+                        <input type="text" class="inp" placeholder="Component's ID">
+                    </div>
+                    
+                </div>
+                <div class="forms flex center">
+                    <div class="inp-field">
+                        <input type="number" class="inp small" min="0" placeholder="Top">
+                        <input type="number" class="inp small" min="0" placeholder="Left">
+                    </div>
+                </div>
+                <div class="forms flex center">
+                    <div class="inp-field">
+                        <div class="color-picker flex">
+                            <input type="text" class="inp" placeholder="color">
+                            <input type="color" class="inp cus-small">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="js/itech/itech.js"></script>
     <script src="js/itech/itech-ui-flowchart.js"></script>
     <script src="js/script.js"></script>

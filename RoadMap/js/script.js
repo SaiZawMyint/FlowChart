@@ -10,7 +10,7 @@ ready(function () {
             "left": "50%"
         },
         callback: function(data){
-            data.initiatedComponent.select();
+         //   data.initiatedComponent.select();
         }
     })
     var component2 = itech(element).flowchart().add({
@@ -33,7 +33,7 @@ ready(function () {
     })
     var component4 = itech(element).flowchart().add({
         title: "My Component 4",
-        id: "mycomponent3",
+        id: "mycomponent4",
         css: {
             "color": "#FFF",
             "top": "200px",
@@ -42,7 +42,7 @@ ready(function () {
     })
     var component5 = itech(element).flowchart().add({
         title: "My Component 5",
-        id: "mycomponent3",
+        id: "mycomponent5",
         css: {
             "color": "#FFF",
             "top": "100px",

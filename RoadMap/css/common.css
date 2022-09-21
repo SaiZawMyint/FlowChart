@@ -90,7 +90,43 @@ body * {
 .flex{
   display: flex;
 }
+.flex-row{
+  flex-direction: row;
+}
+.flex-column{
+  flex-direction: column;
+}
 .flex.center{
   justify-content: center !important;
   align-items: center !important;
+}
+/* input */
+/* buttons */
+.btn,
+.inp{
+  outline: 0;
+  border: 0;
+  border-radius: 5px;
+  padding: 10px 13px;
+}
+.inp{
+  border: 1px solid rgba(0, 0, 0, 0.2)
+}
+.btn{
+  background-color: #42b883;
+  cursor: pointer;
+}
+.btn:hover{
+  background-color: #42b8839e;
+}
+.inp.small{
+  /* min-width: 15%; */
+  width: 100px;
+}
+.color-picker{
+  flex-basis: auto;
+  width: fit-content !important;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
