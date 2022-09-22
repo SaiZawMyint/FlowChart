@@ -1,9 +1,9 @@
 const defaultComponentSetting = {
     title: "hello",
-    id: "",
-    css: { color: "#FFF" },
+    id: '',
+    css: { color: "#FFF", top: "50px",left: Calculator.screenCenter().x+"px","background-color": "#0181a7"},
     hover: {
-        "background-color": "#0000004c"
+        "opacity": "0.6"
     },
     element: function () {
         var comp = new Component().create('span').css(Design.Data.button)
@@ -20,6 +20,11 @@ const defaultComponentSetting = {
     },
     draggable: true,
     selectable: true,
+    connector:{
+        type: 'line',
+        color: '#333',
+        size: '3'
+    },
     callback: function (data) {
     }
 }
@@ -30,7 +35,9 @@ window.prevents = {
     }
 }
 window.components = []
-
+function createId () {
+    return "_itech_"+Math.floor(Date.now() / 1000)
+}
 /**
  * @param {HTMLElement,Object} element
  */
@@ -69,10 +76,11 @@ class FlowChart {
     }
     init(element, setting) {
         this.element = element ? element : this.element
+        this.element.css({'user-select':'none'})
         this.setting = setting ? Object.assign({}, setting) : this.setting
         this.element.css({
             position: "relative",
-            height: "600px",
+            height: "100vh",
             display: "inline-block"
         });
         this.element.appendChild(this.svgelement.svg);
@@ -140,7 +148,8 @@ class FlowChart {
         comp.hover(setting.hover)
         comp.rename()
         window.components.push(this);
-        setting.id ? comp.component.id = setting.id : null
+        setting.id = createId()
+        setting.id ? comp.component.id = setting.id : createId()
         if (setting.draggable)
             comp.drag();
         comp.context([
@@ -156,12 +165,28 @@ class FlowChart {
             },
             {
                 name: "Paste", key: "Ctrl + V", callback: function (data) {
-                    console.log(data)
+                   
+                }
+            }
+            ,
+            {
+                name: "Delete", key: "Delete", callback: function (data) {
+                    for(let x of data.target.children){
+                        if(!x.classList.contains('_join_component')) continue
+                        if(x.hasAttribute('data-jp-current')){
+                            i_id(x.getAttribute('data-jp-current')).remove()
+                        }
+                        if(x.hasAttribute('data-jp-target')){
+                            i_id(x.getAttribute('data-jp-target')).remove()
+                        }
+                    }
+                    
+                    data.target.remove()
                 }
             }
         ]);
         if (setting.joinPoint) {
-            comp.addJoinPoint(setting.joinPoint,this.svgelement);
+            comp.addJoinPoint(setting.joinPoint,setting.connector,this.svgelement);
         }
         this.element.appendChild(comp.getComponent)
         this.components.push(comp)
@@ -317,6 +342,7 @@ class Component {
                     "justify-content": "space-between",
                     "align-items": "center"
                 });
+                m.classList.add('context-menu-list')
                 m.innerHTML = `<label>${menu.name}</label><small>${menu.key}</small>`
                 m.addEventListener('click', function (e) {
                     menu.callback({ e: e, target: target, menu: menu })
@@ -369,16 +395,22 @@ class Component {
      * @param {Component} element 
      * @param {{x:String}: Object} points 
      */
-    addJoinPoint(points = { top: true, left: true, right: true, bottom: true, size: 10, circle: true, rect: false },svg = new SVG()) {
-        var top = points.top ? new Component().create('span', true).css(Design.Data.joinBtn('top', { width: points.size, height: points.size })).component : null;
-        var left = points.left ? new Component().create('span', true).css(Design.Data.joinBtn('left', { width: points.size, height: points.size })).component : null;
-        var right = points.right ? new Component().create('span', true).css(Design.Data.joinBtn('right', { width: points.size, height: points.size })).component : null;
-        var bottom = points.bottom ? new Component().create('span', true).css(Design.Data.joinBtn('bottom', { width: points.size, height: points.size })).component : null;
+    addJoinPoint(points = { top: true, left: true, right: true, bottom: true, size: 10, circle: true, rect: false},connector,svg = new SVG()) {
+        var top = points.top ? new Component().create('span', true).css(Design.Data.joinBtn('top', { width: points.size, height: points.size,"color":connector.color })).component : null;
+        var left = points.left ? new Component().create('span', true).css(Design.Data.joinBtn('left', { width: points.size, height: points.size,"color":connector.color  })).component : null;
+        var right = points.right ? new Component().create('span', true).css(Design.Data.joinBtn('right', { width: points.size, height: points.size,"color":connector.color  })).component : null;
+        var bottom = points.bottom ? new Component().create('span', true).css(Design.Data.joinBtn('bottom', { width: points.size, height: points.size,"color":connector.color  })).component : null;
 
         top != null ? top.dataset['join_top'] = "true" : null
         left != null ? left.dataset['join_left'] = "true" : null
         right != null ? right.dataset['join_right'] = "true" : null
         bottom != null ? bottom.dataset['join_bottom'] = "true" : null
+
+        top != null ? top.dataset['join_connector_setting'] = JSON.stringify(connector)  : null
+        left != null ? left.dataset['join_connector_setting'] = JSON.stringify(connector) : null
+        right != null ? right.dataset['join_connector_setting'] = JSON.stringify(connector) : null
+        bottom != null ? bottom.dataset['join_connector_setting'] = JSON.stringify(connector) : null
+
         top != null ? this.getComponent.appendChild(top) : null
         left != null ? this.getComponent.appendChild(left) : null
         right != null ? this.getComponent.appendChild(right) : null
@@ -480,7 +512,6 @@ class JOIN {
     }
     static change(idLists, target, opt) {
         var ids = [];
-        console.log(idLists,idLists.includes(" "))
         if (idLists.includes(" ")) {
             var split = idLists.split(" ");
             ids = split.filter(s => s.length > 0);
@@ -490,6 +521,7 @@ class JOIN {
         const rect = target.getBoundingClientRect()
         ids.forEach(id => {
             var t = document.getElementById(id)
+            if(t == null) return
             var path = t.hasAttribute("d") ? t.getAttribute("d") : "";
             var connectorType = t.hasAttribute('data-connector') ?
                 t.getAttribute('data-connector') : "line"
@@ -577,7 +609,9 @@ class SVG {
             pathData.sy = rect.top + (rect.height / 2)
             pathData.ex = e.clientX
             pathData.ey = e.clientY
-            path = new SVG().create('path').attrs({"stroke-width":"3","stroke":"#333", d: pathPoints()});
+            var connector =JSON.parse(target.dataset['join_connector_setting'])
+            console.log(connector,target)
+            path = new SVG().create('path').attrs({"stroke-width":connector.size,"stroke":connector.color, d: pathPoints()});
             svg.svg.appendChild(path.svg);
             document.body.css({cursor: "crosshair"})
             drawLivePath = true
@@ -602,7 +636,8 @@ class SVG {
         }
         function updateJoin(current,target,path){
             if(!current.classList.contains('_join_component') ||
-            !target.classList.contains('_join_component')){
+            !target.classList.contains('_join_component') ||
+            current.parentElement == target.parentElement){
                 path.svg.remove()
                 return false
             } 
@@ -643,6 +678,5 @@ class SVG {
         }
     }
 }
-
 
 const itechFlowchart = new FlowChart();

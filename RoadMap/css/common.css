@@ -129,4 +129,12 @@ body * {
   border-radius: 5px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   cursor: pointer;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.btn.secondary{
+  background-color: #d4d4d4;
+}
+.btn.secondary:hover{
+  background-color: #d4d4d44c;
 }

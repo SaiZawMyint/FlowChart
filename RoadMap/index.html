@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flow Chart</title>
+    <link rel="stylesheet" href="font/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -13,7 +14,7 @@
 
         <div class="contents" id="flowChart">
             <div class="btn-field">
-                <button class="btn">Add Component</button>
+                <button class="btn" id="add-comp-btn">Add Component</button>
             </div>
             
         </div>
@@ -23,35 +24,53 @@
     </div>
     <!-- /.wrapper -->
     <div class="modal-field">
-        <div class="modal-box">
+        <div class="modal-box flex flex-column">
             <div class="modal-head">Add Component</div>
             <div class="modal-body flex flex-column">
                 <div class="forms flex center">
                     <div class="inp-field">
-                        <input type="text" class="inp" placeholder="Component's Name">
+                        <input type="text" id="comp-name" class="inp" placeholder="Component's Name">
                     </div>
                     
                 </div>
-                <div class="forms flex center">
+                <!-- <div class="forms flex center">
                     <div class="inp-field">
-                        <input type="text" class="inp" placeholder="Component's ID">
+                        <input type="text" id="comp-id" class="inp" placeholder="Component's ID">
                     </div>
                     
-                </div>
+                </div> -->
                 <div class="forms flex center">
                     <div class="inp-field">
-                        <input type="number" class="inp small" min="0" placeholder="Top">
-                        <input type="number" class="inp small" min="0" placeholder="Left">
+                        <input type="number" id="comp-top" class="inp small" min="0" placeholder="Top">
+                        <input type="number" id="comp-left" class="inp small" min="0" placeholder="Left">
                     </div>
                 </div>
                 <div class="forms flex center">
                     <div class="inp-field">
                         <div class="color-picker flex">
-                            <input type="text" class="inp" placeholder="color">
-                            <input type="color" class="inp cus-small">
+                            <input type="text" id="comp-bg-color" class="inp" placeholder="Background">
+                            <div class="color-tool fas fa-fill-drip" id="bg-ref-color">
+                                <input type="color" id="back-color" class="color-inp" data-color="comp-bg-color">
+                            </div>
+                        </div>
+                        <div class="color-picker flex">
+                            <input type="text" id="comp-color" class="inp" placeholder="Color">
+                            <div class="color-tool fas fa-fill-drip" id="ref-color">
+                                <input type="color" id="fore-color" class="color-inp" data-color="comp-color">
+                            </div>
+                        </div>
+                        <div class="color-picker flex">
+                            <input type="text" id="line-color" class="inp" placeholder="Line Color">
+                            <div class="color-tool fas fa-fill-drip" id="ref-line-color">
+                                <input type="color" id="connector-color" class="color-inp" data-color="line-color">
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="modal-footer flex center">
+                <button class="btn secondary close-modal">Cancel</button>
+                <button class="btn create-comp">Create</button>
             </div>
         </div>
     </div>

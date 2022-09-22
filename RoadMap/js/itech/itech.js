@@ -60,22 +60,46 @@ window.itech = function (selector) {
             }
         },
         on:function(event,handler){
-            if(selected instanceof Array){
+             if(selected instanceof HTMLElement){
+                itechEvent.on(selected,event,handler,false);
+            }else{
                 command(function(ele){
                     itechEvent.on(ele,event,handler,false);
                 })
-            }else if(selected instanceof HTMLElement){
-                itechEvent.on(selected,event,handler,false);
             }
             
+        },
+        object:function(obj){
+            return new FObject(selected).filterObject(obj)
+        },
+        show:function(){
+            command(function(ele){
+                ele.style.display = 'block'
+            })
+        },
+        hide: function(){
+            command(function(ele){
+                ele.style.display = 'none'
+            })
+        },
+        color: function(color){
+            return generateLightOrDarkColor(color)
+        },
+        get:function(index){
+            if(index != null ) return selected[index]
+            return selected
         }
     }
 }
+function generateLightOrDarkColor(color){
 
+}
 //short function
 function _(selector) {
+   
     if (selector instanceof HTMLElement) return selector
-    return document.querySelectorAll(selector);
+    if(typeof selector === 'string') return document.querySelectorAll(selector)
+    return selector
 }
 function i_id(id) {
     return document.getElementById(id);
@@ -110,12 +134,12 @@ class Design {
             "left": "50%",
             "transform": "translateX(-50%)",
             "display": "block",
-            "position": "absolute"
+            "position": "absolute",
+            "opacity": "1"
         },
         joinBtn: function (direction, css) {
             let w = css.width ? css.width : 3
             let h = css.height ? css.height : 3
-
             let style = {
                 "position": "absolute",
                 "border-radius": "50%",
@@ -163,10 +187,9 @@ class IEvent{
     constructor(){
         
     }
-    on(element, events, handler, usedCapture, args){
+    on(element, events, handler, usedCapture = false, args){
         var evt = this.analyseEvts(events)
         evt.forEach((e)=>{
-            console.log(handler)
             element.addEventListener(e,handler,usedCapture)
         });
     }
@@ -200,6 +223,16 @@ class IEvent{
         })
     }
 }
+
+class Calculator{
+    static screenCenter(){
+        return{
+            x: window.innerWidth / 2,
+            y: window.innerHeight / 2
+        }
+    }
+}
+
 var x = 0
 HTMLElement.prototype.css = function (css = {}) {
     var style = this.getAttribute("style") != null ? this.getAttribute("style") : ""

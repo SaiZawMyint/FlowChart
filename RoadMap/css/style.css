@@ -18,11 +18,11 @@
   overflow: hidden;
 }
 ._box_selected{
-  box-shadow: inset 0 0 0 2px #007ef3;
+  box-shadow: inset 0 0 0 2px #007ef3 !important;
 }
 ._box_selected ._join_component{
   background-color: #FFF;
-  box-shadow: 0 0 0 1px #007ef3;
+  box-shadow: 0 0 0 1px #007ef3 !important;
 }
 .btn-field .btn{
   margin: 10px;
@@ -34,6 +34,7 @@
   width: 100%;
   height: 100%;
   background-color: #0000004c;
+  display: none;
 }
 .modal-box{
   width: 35%;
@@ -54,6 +55,13 @@
   width: 100%;
   height: 100%;
   display: flex;
+  overflow: auto;
+}
+.modal-footer{
+  padding: 20px;
+}
+.modal-footer .btn{
+  margin: 0 20px;
 }
 .forms{
   margin: 10px;
@@ -72,14 +80,36 @@
   align-items: center;
 }
 .color-picker .inp{
-  width: 50%;
+  width: 100%;
 }
 .color-picker *{
   background-color: transparent;
   border: 0;
 }
-.inp.cus-small{
+.color-picker .color-tool{
   display: block;
-  width: 35px;
-  height: 100%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  position: relative;
+  background-color: #b9adad4c;
+}
+.color-tool::before{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+.color-picker .color-tool:hover::before{
+  color: #0181a7;
+}
+.color-picker .color-inp{
+  width: 0;
+  opacity: 0;
+}
+.context-menu-list *{
+  cursor: pointer;
+}
+.context-menu-list:hover{
+  background-color: #0000004c;
 }
