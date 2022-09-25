@@ -1,3 +1,65 @@
+.header-menu{
+  list-style: none;
+  display: flex;
+  background-color: #16616bcd;
+  border: 2px solid #16616bcd;
+  border-radius: 5px;
+}
+.main-menu-field{
+  position: relative;
+}
+.menu-ref-box{
+  position: absolute;
+  top: calc(100% + 3px);
+  background-color: #0e3f45a1;
+  max-width: 200px;
+  display: flex;
+  overflow: hidden;
+  border-radius: 3px;
+  display: none;
+}
+.menu-ref-box.line{
+  left: 50%;
+  transform: translateX(-50%);
+}
+.menu-ref-box .r{
+  width: 35px;
+  height: 35px;
+  padding: 5px;
+}
+.menu-ref-box .r .img{
+  width: 80%;
+}
+.menu-ref-box .r .fas{
+  font-size: 13px;
+}
+.menu-ref-box .r .fas.x-2x{
+  font-size: 20px;
+}
+.menu-ref-box .r input[type="color"]{
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+.main-list{
+  color: #FFF;
+  padding: 5px 14px;
+  cursor: pointer;
+  width: 35px;
+  height: 35px;
+  position: relative;
+}
+.main-list .icon{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+.main-list:hover,
+.main-list.active,
+.menu-ref-box .r:hover{
+  background-color: #FFFFFF4c;
+}
 .nav{
   margin: 0 10px;
   list-style: none;
@@ -35,6 +97,7 @@
   height: 100%;
   background-color: #0000004c;
   display: none;
+  z-index: 999;
 }
 .modal-box{
   width: 35%;
@@ -112,4 +175,15 @@
 }
 .context-menu-list:hover{
   background-color: #0000004c;
+}
+.col-refs{
+  width: 35px;
+  height: 35px;
+  background-color: #0000004c;
+  border-radius: 5px;
+  margin: 0 10px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+}
+svg path{
+  cursor: pointer;
 }

@@ -12,10 +12,44 @@
 <body>
     <div class="wrapper">
 
-        <div class="contents" id="flowChart">
-            <div class="btn-field">
-                <button class="btn" id="add-comp-btn">Add Component</button>
+        <header class="header">
+            <div class="main-menu-field">
+                <ul class="header-menu">
+                    <li class="main-list"><i class="fas fa-mouse-pointer icon"></i></li>
+                    <li class="main-list" data-hide="#r-line"><i class="fas fa-slash icon"></i>
+                        <div class="menu-ref-box line" id="r-line">
+                            <span class="r ref-line flex center"><i class="fas fa-slash"></i></span>
+                            <span class="r ref-line flex center"><img src="img/curve-ico.svg" alt="" class="img"></span>
+                            <span class="r ref-line flex center"><img src="img/poly-line-ico.svg" alt="" class="img"></span>
+                        </div>
+                    </li>
+                    <li class="main-list" id="add-comp-btn"><i class="fas fa-square icon"></i></li>
+                    <li class="main-list" data-hide="#r-color"><i class="fas fa-tint icon"></i>
+                        <div class="menu-ref-box line" id="r-color">
+                            <span class="r ref-line flex center"><i class="fas fa-square x-2x c-primary"></i></span>
+                            <span class="r ref-line flex center"><i class="fas fa-square x-2x c-secondary"></i></span>
+                            <span class="r ref-line flex center"><i class="fas fa-square x-2x c-black"></i></span>
+                            <span class="r ref-line flex center"><i class="fas fa-square x-2x c-white"></i></span>
+                            <span class="r ref-line flex center" data-click="#choose-tink-color">
+                                <i class="fas fa-palette c-hash"></i>
+                                <input type="color" id="choose-tink-color">
+                            </span>
+                        </div>
+                    </li>
+                    <li class="main-list"><i class="fas fa-fill-drip icon"></i></li>
+                    <li class="main-list"><i class="fas fa-tools icon"></i></li>
+                </ul>
             </div>
+            <button class="float-btn">
+                <img src="img/grid-ico.svg" alt="" class="img">
+            </button>
+        </header>
+        <!-- /.header -->
+
+        <div class="contents" id="flowChart">
+            <!-- <div class="btn-field">
+                <button class="btn" id="add-comp-btn">Add Component</button>
+            </div> -->
             
         </div>
         <!-- /.contents -->
@@ -29,7 +63,7 @@
             <div class="modal-body flex flex-column">
                 <div class="forms flex center">
                     <div class="inp-field">
-                        <input type="text" id="comp-name" class="inp" placeholder="Component's Name">
+                        <input type="text" id="comp-name" class="inp blame" placeholder="Component's Name">
                     </div>
                     
                 </div>
@@ -47,24 +81,34 @@
                 </div>
                 <div class="forms flex center">
                     <div class="inp-field">
-                        <div class="color-picker flex">
-                            <input type="text" id="comp-bg-color" class="inp" placeholder="Background">
-                            <div class="color-tool fas fa-fill-drip" id="bg-ref-color">
-                                <input type="color" id="back-color" class="color-inp" data-color="comp-bg-color">
+                        <div class="flex align-center my-1">
+                            <div class="color-picker flex">
+                                <input type="text" id="comp-bg-color" class="inp" value="#000000" placeholder="Background">
+                                <div class="color-tool fas fa-fill-drip" id="bg-ref-color">
+                                    <input type="color" id="back-color" class="color-inp" data-color="#comp-bg-color" data-cref="#b-r">
+                                </div>
                             </div>
+                            <div class="col-refs" id="b-r"></div>
                         </div>
-                        <div class="color-picker flex">
-                            <input type="text" id="comp-color" class="inp" placeholder="Color">
-                            <div class="color-tool fas fa-fill-drip" id="ref-color">
-                                <input type="color" id="fore-color" class="color-inp" data-color="comp-color">
+                        <div class="flex align-center my-1">
+                            <div class="color-picker flex">
+                                <input type="text" id="comp-color" class="inp" value="#FFFFFF" placeholder="Color">
+                                <div class="color-tool fas fa-fill-drip" id="ref-color">
+                                    <input type="color" id="fore-color" class="color-inp" data-color="#comp-color" data-cref="#b-c">
+                                </div>
                             </div>
+                            <div class="col-refs" id="b-c" style="background-color: #FFFFFF;"></div>
                         </div>
-                        <div class="color-picker flex">
-                            <input type="text" id="line-color" class="inp" placeholder="Line Color">
-                            <div class="color-tool fas fa-fill-drip" id="ref-line-color">
-                                <input type="color" id="connector-color" class="color-inp" data-color="line-color">
+                        <div class="flex align-center my-1">
+                            <div class="color-picker flex">
+                                <input type="text" id="line-color" class="inp" value="#000000" placeholder="Line Color">
+                                <div class="color-tool fas fa-fill-drip" id="ref-line-color">
+                                    <input type="color" id="connector-color" class="color-inp" data-color="#line-color" data-cref="#b-l">
+                                </div>
                             </div>
+                            <div class="col-refs" id="b-l"></div>
                         </div>
+                        
                     </div>
                 </div>
             </div>
@@ -79,27 +123,3 @@
     <script src="js/script.js"></script>
 </body>
 </html>
-
-<!-- <header class="header">
-             <div class="container text-center">
-                <h1 class="logo">Vue JS Road Map</h1>
-                <ul class="nav">
-                    <li class="nav-li">
-                        <a href="https://github.com/SaiZawMyint/portfolio/tree/VueRoadMap" class="link icon-view">
-                            <img src="RoadMap/src/assets/img/img_github.png" alt="github.com" class="img">
-                            <span class="lab">Github</span>
-                        </a>
-                    </li>
-                    <li class="nav-li">
-                        <a href="https://github.com/SaiZawMyint/portfolio/tree/VueRoadMap" class="link icon-view">
-                            <img src="RoadMap/src/assets/img/img_facebook.png" alt="github.com" class="img">
-                            <span class="lab">Facebook</span>
-                        </a>
-                    </li>
-                    <li class="nav-li">
-                        <a href="" class="link icon-view"></a>
-                    </li>
-                </ul>
-            </div> 
-        </header> -->
-        <!-- /.header -->

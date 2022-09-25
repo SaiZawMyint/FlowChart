@@ -2,13 +2,21 @@ var element = null;
 ready(function () {
     element = document.getElementById("flowChart");
     itech(element).flowchart().init();
+    itech('.float-btn').on('click',function(){
+        itech(element).flowchart().grid()
+    })
     itech('#add-comp-btn').on('click',function(){
+        if(itech(this).hasClass('active'))
+            itech('.modal-field').hide()
+        else
         itech('.modal-field').show()
     })
     itech('.btn.close-modal').on('click',function(){
+        itech('#add-comp-btn').removeClass('active')
         itech('.modal-field').hide()
     })
     itech('.btn.create-comp').on('click',function(){
+        itech('#add-comp-btn').removeClass('active')
         createComponent()
     })
     itech('#bg-ref-color').on('click',function(){
@@ -24,9 +32,32 @@ ready(function () {
         back.click()
     })
     itech('.color-inp').on('input',function(){
-        var ref = itech('#'+this.dataset['color']).get(0)
+        var ref = itech(this.dataset['color']).get(0)
         this.parentElement.style.color = this.value
         ref.value = this.value
+        itech(this.dataset['cref']).css({"background-color":this.value})
+    })
+    itech('.inp.blame').on('input',function(){
+        if(this.value.trim().length > 0) itech(this).removeClass('error')
+        if(this.value.trim().length == 0) itech(this).addClass('error')
+    })
+    itech('.main-list').on('click',function(){
+        itech(this).toggleClass('active')
+        itech('.main-list').loop((ele)=>{
+            if(ele != this && itech(ele).hasClass('active')){
+                itech(ele).removeClass('active')
+                
+                itech(ele.dataset['hide']).hide()
+            } 
+        })
+        if(itech(this).isDataSet('hide'))
+            itech(this.dataset['hide']).toggleShow('flex')
+    })
+    itech('.ref-line').on('click',function(e){
+        e.stopPropagation();
+        if(itech(this).isDataSet('click')){
+           itech(itech(this).data('click')).get(0).click()
+        }
     })
 });
 function createComponent(){
@@ -36,7 +67,10 @@ function createComponent(){
     var compbgcolor = itech('#comp-bg-color').get(0)
     var compcolor = itech('#comp-color').get(0)
     var complinecolor = itech('#line-color').get(0)
-
+    if(compname.value.trim().length == 0){
+        itech(compname).addClass('error')
+        return false;
+    }
     console.log(comptop.value, compleft.value)
     var setting = defaultComponentSetting
     setting.title = compname.value

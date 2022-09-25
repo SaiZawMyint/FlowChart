@@ -11,6 +11,7 @@ var flowchartSetting = {
 window.itech = function (selector) {
     var selected = _(selector)
     function command(cmd) {
+        if(selected == null) return false;
         [].forEach.call(selected, cmd);
     };
     return {
@@ -27,11 +28,7 @@ window.itech = function (selector) {
                 },
                 add: function(setting){
                     if(!flowchartSetting.initiate.status) init()
-                    var callback = function(data){
-
-                    }
                     return itechFlowchart.createComponent(setting).initiatedComponent
-                    
                 },
                 joins: function(comp1,comp2,edge = {current: 'bottom',target: 'top'},css,connectorType){
                     var cdir = 'current' in edge ? edge.current: 'bottom'
@@ -56,6 +53,17 @@ window.itech = function (selector) {
                     css ? joinsetting.css = css:null
                     connectorType ? joinsetting.connector.type = connectorType:null
                     itechFlowchart.joinTo(joinsetting)
+                },
+                grid: function(){
+                    if(!flowchartSetting.initiate.status) init()
+                    if(itechFlowchart.setting.grid.opt){
+                        itechFlowchart.setting.grid.opt = false
+                        return itechFlowchart.removeGrid()
+                    }else{
+                        itechFlowchart.setting.grid.opt = true
+                        return itechFlowchart.buildGrid()
+                    }
+                    
                 }
             }
         },
@@ -72,9 +80,9 @@ window.itech = function (selector) {
         object:function(obj){
             return new FObject(selected).filterObject(obj)
         },
-        show:function(){
+        show:function(cmd = 'block'){
             command(function(ele){
-                ele.style.display = 'block'
+                ele.style.display = cmd
             })
         },
         hide: function(){
@@ -82,8 +90,92 @@ window.itech = function (selector) {
                 ele.style.display = 'none'
             })
         },
+        toggleShow:function(cmd){
+            const current = this
+            command(function(ele){
+                if(window.getComputedStyle(ele).display == 'none') current.show(cmd)
+                else current.hide()
+            })
+            
+        },
+        addClass: function(cls){
+            if(selected instanceof HTMLElement){
+                selected.classList.add(cls)
+            }else{
+                command(function(ele){
+                    ele.classList.add(cls)
+                })
+            }
+        },
+        removeClass: function(cls){
+            if(selected instanceof HTMLElement){
+                selected.classList.remove(cls)
+            }else{
+                command(function(ele){
+                    ele.classList.remove(cls)
+                })
+            }
+        },
+        toggleClass: function(cls){
+            if(selected instanceof HTMLElement){
+                if(selected.classList.contains(cls)) selected.classList.remove(cls)
+                else selected.classList.add(cls)
+            }else{
+                command(function(ele){
+                    if(ele.classList.contains(cls)) ele.classList.remove(cls)
+                    else ele.classList.add(cls)
+                })
+            }
+            
+        },
+        hasClass: function(cls){
+            var has = false
+            if(selected instanceof HTMLElement){
+                has = selected.classList.contains(cls)
+            }else{
+                command(function(ele){
+                    has = ele.classList.contains(cls)
+                })
+            }
+            return has
+        },
+        css: function(css){
+            if(selected instanceof HTMLElement){
+                selected.css(css)
+            }else{
+                command(function(ele){
+                    ele.css(css)
+                })
+            }
+        },
         color: function(color){
             return generateLightOrDarkColor(color)
+        },
+        loop: function(callback){
+            [].forEach.call(selected,callback)
+        },
+        data:function(data){
+            var x;
+            if(selected instanceof Element){
+                x = selected.getAttribute(`data-${data}`)
+            }else{
+                x = []
+                command(function(ele){
+                    x.push(ele.getAttribute(`data-${data}`))
+                })
+            }
+            return x;
+        },
+        isDataSet: function(data){
+            var has = false
+            if(selected instanceof HTMLElement){
+                has = selected.getAttribute(`data-${data}`) != null
+            }else{
+                command(function(ele){
+                    has = ele.getAttribute(`data-${data}`) != null
+                })
+            }
+            return has;
         },
         get:function(index){
             if(index != null ) return selected[index]
@@ -96,8 +188,7 @@ function generateLightOrDarkColor(color){
 }
 //short function
 function _(selector) {
-   
-    if (selector instanceof HTMLElement) return selector
+    if (selector instanceof Element) return selector
     if(typeof selector === 'string') return document.querySelectorAll(selector)
     return selector
 }
@@ -224,12 +315,30 @@ class IEvent{
     }
 }
 
+class Drag{
+    constructor(){
+
+    }
+}
+
 class Calculator{
     static screenCenter(){
         return{
             x: window.innerWidth / 2,
             y: window.innerHeight / 2
         }
+    }
+    static convertStringToArray(str, regex){
+        let ary = str.split(regex)
+        ary = ary.filter(a=> a.trim().length > 0)
+        return ary
+    }
+    static convertArrayToString(ary, regex){
+        let str = '';
+        ary.forEach((a)=>{
+            str+=a+regex
+        })
+        return str
     }
 }
 
@@ -265,6 +374,18 @@ String.prototype.parseObject = function () {
         obj[`${props[0].trim()}`] = props[1].trim();
     }
     return obj;
+}
+Array.prototype.remove = function(index){
+    if(typeof index == 'number'){
+        this.slice(index,1)
+        return this
+    }else{
+        const ind = this.indexOf(index)
+        if(ind > -1){
+            this.splice(ind,1)
+            return this
+        }
+    }
 }
 class FObject {
     constructor(obj) {

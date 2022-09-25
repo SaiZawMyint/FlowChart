@@ -37,6 +37,7 @@ body * {
   width: 100%;
   padding: 0px;
   margin: 0 auto;
+  user-select: none;
 }
 
 .header{
@@ -44,7 +45,10 @@ body * {
   top: 0;
   left: 0;
   padding: 10px;
-  background-color: #42b883;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
 }
 .logo{
   font-size: 25px;
@@ -100,6 +104,9 @@ body * {
   justify-content: center !important;
   align-items: center !important;
 }
+.flex.align-center{
+  align-items: center;
+}
 /* input */
 /* buttons */
 .btn,
@@ -130,11 +137,67 @@ body * {
   border: 1px solid rgba(0, 0, 0, 0.2);
   cursor: pointer;
   overflow: hidden;
-  margin-bottom: 10px;
 }
 .btn.secondary{
   background-color: #d4d4d4;
 }
 .btn.secondary:hover{
   background-color: #d4d4d44c;
+}
+.float-btn{
+  background-color: #16616bcd;
+  border: 2px solid #16616bcd;
+  width: 30px;
+  height: 30px;
+  color: #FFF;
+  border-radius: 5px;
+  margin-left: 10px;
+  padding: 5px;
+  cursor: pointer;
+}
+.float-btn:hover{
+  background-color: #16616b4c;
+}
+/* margin */
+.m-1{
+  margin: 1em;
+}
+.m-2{
+  margin: 2em;
+}
+.mx-1{
+  margin-left: 1em;
+  margin-right: 1em;
+}
+.mx-2{
+  margin-left: 1em;
+  margin-right: 1em;
+}
+.my-1{
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+.my-2{
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+/* error */
+.inp.error{
+  border-color: rgb(243, 67, 67) !important;
+}
+/* colors */
+.c-primary{
+  color: #42b883;
+}
+.c-secondary{
+  color: aqua;
+}
+.c-black{
+  color: #333;
+}
+.c-white{
+  color: #FFF;
+}
+.c-hash{
+  color: #d4d4d4;
 }
