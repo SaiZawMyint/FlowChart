@@ -16,7 +16,7 @@ ready(function () {
         itech('.modal-field').hide()
     })
     itech('.btn.create-comp').on('click',function(){
-        itech('#add-comp-btn').removeClass('active')
+        
         createComponent()
     })
     itech('#bg-ref-color').on('click',function(){
@@ -71,7 +71,7 @@ function createComponent(){
         itech(compname).addClass('error')
         return false;
     }
-    console.log(comptop.value, compleft.value)
+    itech('#add-comp-btn').removeClass('active')
     var setting = defaultComponentSetting
     setting.title = compname.value
     if(comptop.value.length > 0) setting.css.top = comptop.value +'px'
