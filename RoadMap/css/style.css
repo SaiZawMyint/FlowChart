@@ -82,6 +82,9 @@
 ._box_selected{
   box-shadow: inset 0 0 0 2px #007ef3 !important;
 }
+circle._box_selected{
+  stroke: #007ef3 !important;
+}
 ._box_selected ._join_component{
   background-color: #FFF;
   box-shadow: 0 0 0 1px #007ef3 !important;
@@ -186,4 +189,7 @@
 }
 svg path{
   cursor: pointer;
+}
+.tint-color *:hover{
+  cursor: inherit !important;
 }

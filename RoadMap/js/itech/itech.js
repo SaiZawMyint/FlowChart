@@ -109,7 +109,7 @@ window.itech = function (selector) {
             });
         },
         addClass: function (cls) {
-            if (selected instanceof HTMLElement) {
+            if (selected instanceof Element) {
                 selected.classList.add(cls);
             } else {
                 command(function (ele) {
@@ -118,7 +118,7 @@ window.itech = function (selector) {
             }
         },
         removeClass: function (cls) {
-            if (selected instanceof HTMLElement) {
+            if (selected instanceof Element) {
                 selected.classList.remove(cls);
             } else {
                 command(function (ele) {
@@ -127,7 +127,7 @@ window.itech = function (selector) {
             }
         },
         toggleClass: function (cls) {
-            if (selected instanceof HTMLElement) {
+            if (selected instanceof Element) {
                 if (selected.classList.contains(cls)) selected.classList.remove(cls);
                 else selected.classList.add(cls);
             } else {
@@ -139,7 +139,7 @@ window.itech = function (selector) {
         },
         hasClass: function (cls) {
             var has = false;
-            if (selected instanceof HTMLElement) {
+            if (selected instanceof Element) {
                 has = selected.classList.contains(cls);
             } else {
                 command(function (ele) {
@@ -149,13 +149,25 @@ window.itech = function (selector) {
             return has;
         },
         css: function (css) {
-            if (selected instanceof HTMLElement) {
-                selected.css(css);
+            var res = null
+            if (selected instanceof Element) {
+                if (typeof css === 'string') {
+                    res = getComputedStyle(selected).getPropertyValue(css)
+                } else {
+                    selected.css(css);
+                }
+
             } else {
                 command(function (ele) {
-                    ele.css(css);
+
+                    if (typeof css === 'string') {
+                        res = ele.style.getPropertyValue(css)
+                    } else {
+                        ele.css(css)
+                    }
                 });
             }
+            return res
         },
         color: function (color) {
             return generateLightOrDarkColor(color);
@@ -186,11 +198,16 @@ window.itech = function (selector) {
             }
             return has;
         },
-        size: function(){
-            if(selected instanceof Element){
+        size: function () {
+            if (selected instanceof Element) {
                 return 1
-            }else{
+            } else {
                 return selected.length
+            }
+        },
+        attr: function(attr,val){
+            if(selected instanceof Element){
+                if(val == null || val == undefined) return selected.getAttribute(attr)
             }
         },
         get: function (index) {
@@ -284,6 +301,21 @@ class Design {
             return style;
         },
     };
+    static customCursor(code,color){
+        var canvas = document.createElement("canvas");
+        canvas.width = 15;
+        canvas.height = 15;
+        //document.body.appendChild(canvas);
+        var ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#000000";
+        ctx.font = "15px FontAwesome";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = color
+        ctx.fillText(code, 7, 7);
+        var dataURL = canvas.toDataURL('image/png')
+        return dataURL
+    }
 }
 
 class IEvent {
@@ -350,7 +382,7 @@ class Calculator {
         });
         return str;
     }
-    static generateNewPointAtCenter(start,end,count){
+    static generateNewPointAtCenter(start, end, count) {
         var coor = [start, end]
         addNewPoint(count)
         return coor
@@ -378,7 +410,7 @@ class Calculator {
             index: index
         }
         function addCoor(cor = { x: 0, y: 0 }) {
-            
+
             if (!loop(true)) {
                 loop(false)
             }
@@ -390,14 +422,14 @@ class Calculator {
                     var nextx = coor[i + 1][find];
                     if (cor[find] == x) {
                         index = i + 1
-                        console.log(i+1)
+                        console.log(i + 1)
                         coor.splice(i + 1, 0, cor);
                         is = true;
                         break;
                     }
                     if (cor[find] > x && cor[find] <= nextx || cor[find] < x && cor[find] >= nextx) {
                         index = i + 1
-                        console.log(i+1)
+                        console.log(i + 1)
                         coor.splice(i + 1, 0, cor);
                         is = true;
                         break;
@@ -407,8 +439,96 @@ class Calculator {
                 }
                 return is;
             }
-           
+
         }
+    }
+    static generateCorner(data) {
+        var x = data.replaceAll(/  +/g,' ')
+        console.log(x)
+        var process = {}
+        process.argv = x.split(' ')
+        var radius = 12;
+
+        var lineToVector = function (p1, p2) {
+            var vector = {
+                x: p2.x - p1.x,
+                y: p2.y - p1.y
+            };
+            return vector;
+        }
+
+        var vectorToUnitVector = function (v) {
+            var magnitude = v.x * v.x + v.y * v.y;
+            var magnitude = Math.sqrt(magnitude);
+            var unitVector = {
+                x: v.x / magnitude,
+                y: v.y / magnitude
+            };
+            return unitVector;
+        }
+
+        var roundOneCorner = function (p1, corner, p2) {
+            var corner_to_p1 = lineToVector(corner, p1);
+            var corner_to_p2 = lineToVector(corner, p2);
+            var corner_to_p1_unit = vectorToUnitVector(corner_to_p1);
+            var corner_to_p2_unit = vectorToUnitVector(corner_to_p2);
+
+            var curve_p1 = {
+                x: corner.x + corner_to_p1_unit.x * radius,
+                y: corner.y + corner_to_p1_unit.y * radius
+            };
+            var curve_p2 = {
+                x: corner.x + corner_to_p2_unit.x * radius,
+                y: corner.y + corner_to_p2_unit.y * radius
+            };
+            var path = {
+                line_end: curve_p1,
+                curve_control: corner,
+                curve_end: curve_p2
+            };
+            return path;
+        }
+
+        var printPath = function (path) {
+            return (" L " + path.line_end.x.toFixed(1) + "," + path.line_end.y.toFixed(1))+" "+("Q " + path.curve_control.x.toFixed(1) + "," + path.curve_control.y.toFixed(1)
+                + " " + path.curve_end.x.toFixed(1) + "," + path.curve_end.y.toFixed(1));
+        }
+        
+        //check input
+        if (process.argv.length <= 2) {
+            throw new Error("enter at least one point");
+        }
+        if (process.argv.length % 2 !== 0) {
+            throw new Error("you entered " + (process.argv.length - 2) + " numbers, but each point should have two numbers");
+        }
+        if (process.argv.length < 6) {
+            throw new Error("need at least 3 points");
+            
+        }
+
+        //main
+        var pointdata = ("M " + process.argv[2] + "," + process.argv[3]);
+        for (var i = 2; i + 5 < process.argv.length; i += 2) {
+
+            var p1 = {
+                x: parseInt(process.argv[i]),
+                y: parseInt(process.argv[i + 1])
+            }
+            var p2 = {
+                x: parseInt(process.argv[i + 2]),
+                y: parseInt(process.argv[i + 3])
+            }
+            var p3 = {
+                x: parseInt(process.argv[i + 4]),
+                y: parseInt(process.argv[i + 5])
+            }
+            var path = roundOneCorner(p1, p2, p3);
+            pointdata +=printPath(path);
+        }
+
+        var lastArg = process.argv.length - 1;
+        pointdata +=(" L " + process.argv[lastArg - 1] + "," + process.argv[lastArg]+" Z");
+        return pointdata
     }
 }
 
@@ -436,13 +556,15 @@ Element.prototype.css = function (css = {}) {
 String.prototype.parseObject = function () {
     let col = (this.match(/:/g) || []).length;
     let end = (this.match(/;/g) || []).length;
-    if (col != end) throw new Error("Invalid style properties!");
+    if (col != end) console.log("Invalid style properties!");
     var obj = {};
     var splitVals = this.split(";").filter((data) => data.length > 0);
     for (let val of splitVals) {
-        if (!val.includes(":")) throw new Error("Invalid style property: " + val);
+        if (!val.includes(":")) continue
         let props = val.split(":");
-        obj[`${props[0].trim()}`] = props[1].trim();
+        let key = val.substring(0, val.indexOf(":")).trim()
+        let value = val.substring(val.indexOf(":")+1, val.length).trim()
+        obj[key] = value;
     }
     return obj;
 };

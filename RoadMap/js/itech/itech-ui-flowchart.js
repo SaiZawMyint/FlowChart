@@ -1,7 +1,7 @@
 const defaultComponentSetting = {
     title: "hello",
     id: '',
-    css: { color: "#FFF", top: "50px",left: Calculator.screenCenter().x+"px","background-color": "#0181a7"},
+    css: { color: "#FFF", top: "50px", left: Calculator.screenCenter().x + "px", "background-color": "#0181a7" },
     hover: {
         "opacity": "0.6"
     },
@@ -20,7 +20,7 @@ const defaultComponentSetting = {
     },
     draggable: true,
     selectable: true,
-    connector:{
+    connector: {
         type: 'line',
         color: '#333',
         size: '3'
@@ -35,16 +35,21 @@ window.prevents = {
     }
 }
 window.components = []
-var specialCase ={
+var specialCase = {
     copy: null,
-    jpoints: [{current: null,target: null,opt: false}],
-    moveableData: [{parent: null, mover: []}],
+    jpoints: [{ current: null, target: null, opt: false }],
+    moveableData: [{ parent: null, mover: [] }],
     removeItem: {
         element: null,
+    },
+    colorCase:{
+        choose: false,
+        data: '',
+        target: null
     }
 }
-function createId (id = '') {
-    return "_itech_"+ id +(Math.floor(Date.now() / 1000))
+function createId(id = '') {
+    return "_itech_" + id + (Math.floor(Date.now() / 1000))
 }
 /**
  * @param {HTMLElement,Object} element
@@ -85,7 +90,7 @@ class FlowChart {
     }
     init(element, setting) {
         this.element = element ? element : this.element
-        this.element.css({'user-select':'none'})
+        this.element.css({ 'user-select': 'none'})
         this.setting = setting ? Object.assign({}, setting) : this.setting
         this.element.css({
             position: "relative",
@@ -98,12 +103,11 @@ class FlowChart {
         new Component(this.element).context([
             {
                 name: "Paste", key: "Ctrl + V", callback: function (data) {
-                  var copy = specialCase.copy
-                  var setting = Component.copySettingFromDom(copy);
-                  setting.css.top = data.e.pageY + "px"
-                  setting.css.left = data.e.pageX + "px"
-                  console.log(setting)
-                  flowchart.createComponent(setting)
+                    var copy = specialCase.copy
+                    var setting = Component.copySettingFromDom(copy);
+                    setting.css.top = data.e.pageY + "px"
+                    setting.css.left = data.e.pageX + "px"
+                    flowchart.createComponent(setting)
                 }
             }
             ,
@@ -117,8 +121,95 @@ class FlowChart {
                     console.log(data)
                 }
             }
+            ,
+            {
+                name: "Rounded Corner", key: "Ctrl + X", callback: function (data) {
+                    itech('polyline').loop(function (ele) {
+                        var d = ele.getAttribute('points')
+                        var f = d.replaceAll(',', ' ')
+                        var pd = Calculator.generateCorner(f)
+                        ele.removeAttribute('points')
+                        ele.setAttributeNS(null, 'd', pd)
+                        var copy = new SVG().create('path');
+                        var attrs = {}
+                        for (let i = 0; i < ele.attributes.length; i++) {
+                            attrs[ele.attributes[i].name] = ele.attributes[i].value
+                        }
+                        copy.attrNs(attrs)
+                        ele.parentElement.replaceChild(copy.svg, ele)
+                    })
+                }
+            }
         ]);
+        this.initEvents()
         return this
+    }
+    initEvents() {
+        document.addEventListener('mousedown', function (e) {
+            itech('._box_selected').loop(function (ele) {
+                itech(ele).removeClass('_box_selected')
+                if(specialCase.colorCase.choose){
+
+                }
+            })
+            
+        })
+        // var opt = false;
+        // document.addEventListener('keypress',function(e){
+        //     if(e.shiftKey) opt = true
+        // })
+        // document.addEventListener('keyup',function(e){
+        //     if(e.shiftKey) opt = false
+        // })
+        document.addEventListener('keydown', function (e) {
+            switch (e.which) {
+                case 37: moveSelectedComponent('left',e.shiftKey)
+                    break;
+
+                case 38: moveSelectedComponent('up',e.shiftKey)
+                    break;
+
+                case 39: moveSelectedComponent('right',e.shiftKey)
+                    break;
+
+                case 40: moveSelectedComponent('down',e.shiftKey)
+                    break;
+
+                default: return; // exit this handler for other keys
+            }
+            e.preventDefault();
+        })
+
+        function moveSelectedComponent(direction, opt) {
+            itech('._box_selected').loop(function (ele) {
+                const get = ele instanceof HTMLElement ? 'e' : ele instanceof SVGElement && ele.tagName == 'circle' ? 'sc' : 'e'
+                var top = get == 'e' ? parseFloat(itech(ele).css('top')) : get == 'sc' ? parseFloat(itech(ele).attr('cy')) : 0
+                var left = get == 'e' ? parseFloat(itech(ele).css('left')) : get == 'sc' ? parseFloat(itech(ele).attr('cx')) : 0
+                switch (direction) {
+                    case 'up': top -= opt ? 5 : 1
+                        break
+
+                    case 'left': left -= opt ? 5 : 1
+                        break
+
+                    case 'right': left += opt ? 5 : 1
+                        break
+
+                    case 'down': top += opt ? 5 : 1
+                        break
+                }
+                if (get == 'e') itech(ele).css({ top: top + "px", left: left + "px" })
+                if (get == 'sc') {
+                    var index = parseFloat(itech(ele).data('move-index'))
+                    JOIN.updateJoinsByC(left,top,ele.parentElement.firstElementChild,index)
+
+                    ele.setAttributeNS(null, 'cx', left)
+                    ele.setAttributeNS(null, 'cy', top)
+                }
+                JOIN.searchJoins(ele)
+            })
+
+        }
     }
     addSvg() {
         this.svgelement.svg.setAttribute("style", "position: absolute;top: 0;left: 0;")
@@ -130,8 +221,8 @@ class FlowChart {
             }
         }
     }
-    removeGrid(){
-        itech('._itech-grid-line').loop(function(ele){
+    removeGrid() {
+        itech('._itech-grid-line').loop(function (ele) {
             ele.remove()
         })
         itechFlowchart.setting.grid.opt = false
@@ -149,12 +240,12 @@ class FlowChart {
         const spacing = this.setting.grid.spacing != null ? this.setting.grid.spacing : 15;
 
         for (let x = 0; x <= width; x += spacing) {
-            const line = this.svg.create('line').attrs({class: '_itech-grid-line'});
+            const line = this.svg.create('line').attrs({ class: '_itech-grid-line' });
             line.attrNs({ "x1": x, "y1": 0, "x2": x, "y2": height, "stroke": "#333333", "stroke-width": 0.5 });
             this.svgelement.svg.appendChild(line.svg);
         }
         for (let y = 0; y <= height; y += spacing) {
-            var line = this.svg.create('line').attrs({class: '_itech-grid-line'});
+            var line = this.svg.create('line').attrs({ class: '_itech-grid-line' });
             line.attrNs({ "x1": 0, "y1": y, "x2": width, "y2": y, "stroke": "#333333", "stroke-width": 0.5 });
             this.svgelement.svg.appendChild(line.svg);
         }
@@ -184,10 +275,11 @@ class FlowChart {
         var comp = setting.element()
         comp.css(setting.css)
         comp.addText(setting.title)
-        comp.hover(setting.hover)
+       // comp.hover(setting.hover)
         comp.rename()
         window.components.push(this);
         setting.id = createId()
+        itech(comp.component).addClass('_itech-comp-btn')
         setting.id ? comp.component.id = setting.id : createId()
         if (setting.draggable)
             comp.drag();
@@ -210,9 +302,9 @@ class FlowChart {
             {
                 name: "Delete", key: "Delete", callback: function (data) {
                     var storeRef = []
-                    for(let x of data.target.children){
-                        for(let data of specialCase.jpoints){
-                            if(x == data.current){
+                    for (let x of data.target.children) {
+                        for (let data of specialCase.jpoints) {
+                            if (x == data.current) {
                                 let svg = i_id(data.target)
                                 svg.parentElement.remove()
                                 storeRef.push(data.target)
@@ -220,17 +312,12 @@ class FlowChart {
                         }
                     }
                     JOIN.removeRelated(storeRef)
-                    // for(let data of specialCase.jpoints){
-                    //     if(storeRef.includes(data.target)){
-                    //         specialCase.jpoints = specialCase.jpoints.filter(d => d!=data)
-                    //     }
-                    // }
                     data.target.remove()
                 }
             }
         ]);
         if (setting.joinPoint) {
-            comp.addJoinPoint(setting.joinPoint,setting.connector,this.svgelement);
+            comp.addJoinPoint(setting.joinPoint, setting.connector, this.svgelement);
         }
         this.element.appendChild(comp.getComponent)
         this.components.push(comp)
@@ -244,7 +331,7 @@ class FlowChart {
         var point = new JOIN().getJoinablePoint(setting);
         let x = `M ${point.startPoint.x}, ${point.startPoint.y} L ${point.endPoint.x} ${point.endPoint.y}`;
         let path = this.svgelement.drawPath(x, setting.css);
-        path.attrs({ "data-connector": setting.connector.type})
+        path.attrs({ "data-connector": setting.connector.type })
         path.svg.id = "p_" + setting.current.comp.id + "-" + setting.target.comp.id;
     }
 
@@ -288,7 +375,7 @@ class Component {
         return this;
     }
     addText(text) {
-        this.component.innerHTML = `<span style="user-select:none;">${text}</span>`;
+        this.component.innerHTML = `<span style="user-select:none;color:inherit;" class="_itech_fc_text">${text}</span>`;
         var target = this.component
         this.component.firstElementChild.addEventListener('focus', function (e) {
             e.stopPropagation();
@@ -338,19 +425,7 @@ class Component {
         }
 
     }
-    hover(css) {
-        this.hoverProps.org = this.component.getAttribute('style').parseObject();
-        this.hoverProps.prop = css;
-        var compTarget = this
-        this.component.addEventListener('mouseover', function () {
-            this.css(compTarget.hoverProps.prop);
-        });
-        this.component.addEventListener('mouseout', function () {
-            this.css(compTarget.hoverProps.org);
-        })
-    }
     context(menus = [{ name: 'name', key: "", callback: callback }]) {
-        var comp = this
         this.component.addEventListener('contextmenu', function (e) {
             e.preventDefault();
             e.stopPropagation()
@@ -389,9 +464,9 @@ class Component {
                 });
                 m.classList.add('context-menu-list')
                 m.innerHTML = `<label>${menu.name}</label><small>${menu.key}</small>`
-                
+
                 m.addEventListener('click', function (e) {
-                    menu.callback({ e: e, target: target, menu: menu , component: comp, x: x,y: y})
+                    menu.callback({ e: e, target: target, menu: menu, component: comp, x: x, y: y })
                     comp.component.blur()
                 });
                 comp.component.appendChild(m);
@@ -441,18 +516,18 @@ class Component {
      * @param {Component} element 
      * @param {{x:String}: Object} points 
      */
-    addJoinPoint(points = { top: true, left: true, right: true, bottom: true, size: 10, circle: true, rect: false},connector,svg = new SVG()) {
-        var top = points.top ? new Component().create('span', true).css(Design.Data.joinBtn('top', { width: points.size, height: points.size,"color":connector.color })).component : null;
-        var left = points.left ? new Component().create('span', true).css(Design.Data.joinBtn('left', { width: points.size, height: points.size,"color":connector.color  })).component : null;
-        var right = points.right ? new Component().create('span', true).css(Design.Data.joinBtn('right', { width: points.size, height: points.size,"color":connector.color  })).component : null;
-        var bottom = points.bottom ? new Component().create('span', true).css(Design.Data.joinBtn('bottom', { width: points.size, height: points.size,"color":connector.color  })).component : null;
+    addJoinPoint(points = { top: true, left: true, right: true, bottom: true, size: 10, circle: true, rect: false }, connector, svg = new SVG()) {
+        var top = points.top ? new Component().create('span', true).css(Design.Data.joinBtn('top', { width: points.size, height: points.size, "color": connector.color })).component : null;
+        var left = points.left ? new Component().create('span', true).css(Design.Data.joinBtn('left', { width: points.size, height: points.size, "color": connector.color })).component : null;
+        var right = points.right ? new Component().create('span', true).css(Design.Data.joinBtn('right', { width: points.size, height: points.size, "color": connector.color })).component : null;
+        var bottom = points.bottom ? new Component().create('span', true).css(Design.Data.joinBtn('bottom', { width: points.size, height: points.size, "color": connector.color })).component : null;
 
         top != null ? top.dataset['join_top'] = "true" : null
         left != null ? left.dataset['join_left'] = "true" : null
         right != null ? right.dataset['join_right'] = "true" : null
         bottom != null ? bottom.dataset['join_bottom'] = "true" : null
 
-        top != null ? top.dataset['join_connector_setting'] = JSON.stringify(connector)  : null
+        top != null ? top.dataset['join_connector_setting'] = JSON.stringify(connector) : null
         left != null ? left.dataset['join_connector_setting'] = JSON.stringify(connector) : null
         right != null ? right.dataset['join_connector_setting'] = JSON.stringify(connector) : null
         bottom != null ? bottom.dataset['join_connector_setting'] = JSON.stringify(connector) : null
@@ -467,8 +542,8 @@ class Component {
         this.joinBtns.right = right
         this.joinBtns.bottom = bottom
 
-        SVG.addPathAction(svg, top, left,right, bottom)
-        
+        SVG.addPathAction(svg, top, left, right, bottom)
+
     }
     select() {
         if (this.component.classList.contains('_box_selected')) {
@@ -477,12 +552,12 @@ class Component {
             this.component.classList.add('_box_selected')
         }
     }
-    static copySettingFromDom(ele = new HTMLElement()){
-        var setting = Object.assign({},defaultComponentSetting)
+    static copySettingFromDom(ele = new HTMLElement()) {
+        var setting = Object.assign({}, defaultComponentSetting)
         setting.css = ele.getAttribute('style').parseObject();
         setting.title = ele.innerText
         setting.connector = JSON.parse(ele.lastElementChild.getAttribute('data-join_connector_setting'))
-        console.log(setting.connector)
+        console.log(setting)
         return setting
     }
     get getComponent() {
@@ -535,7 +610,10 @@ class JOIN {
             }
         }
     }
-    static addRelationRef(id, joinc, opt){
+    getDirectionSelector(current = new HTMLElement(), currentdir) {
+        return (document.querySelectorAll("#" + current.id + " [data-join_" + currentdir + "]")[0])
+    }
+    static addRelationRef(id, joinc, opt) {
         var val = id;
         var t = opt ? "data-jp-current" : "data-jp-target"
         var existing = joinc.getAttribute(t);
@@ -543,7 +621,7 @@ class JOIN {
             val = existing + " " + id
         }
         joinc.setAttribute(t, val);
-        specialCase.jpoints.push({current: joinc,target: id,opt: opt})
+        specialCase.jpoints.push({ current: joinc, target: id, opt: opt })
     }
     static searchJoins(ele) {
         for (let i = 0; i < ele.children.length; i++) {
@@ -562,23 +640,27 @@ class JOIN {
         if (direction == 'left') return rect.left + rect.width
         if (direction == 'top') return rect.top + rect.height
     }
-    static removeRelated(id){
-        for(let data of specialCase.jpoints){
-            if(id instanceof Array){
-                if(id.includes(data.target)){
-                    specialCase.jpoints = specialCase.jpoints.filter(d => d!=data)
+    static removeRelated(id) {
+        for (let data of specialCase.jpoints) {
+            if (id instanceof Array) {
+                if (id.includes(data.target)) {
+                    specialCase.jpoints = specialCase.jpoints.filter(d => d != data)
                 }
-            }else if(typeof id == 'string'){
-                if(id == data.target){
-                    specialCase.jpoints = specialCase.jpoints.filter(d => d!=data)
+            } else if (typeof id == 'string') {
+                if (id == data.target) {
+                    specialCase.jpoints = specialCase.jpoints.filter(d => d != data)
                 }
             }
         }
     }
-    getDirectionSelector(current = new HTMLElement(), currentdir) {
-        return (document.querySelectorAll("#" + current.id + " [data-join_" + currentdir + "]")[0])
+    static updateJoinsByC(x, y, target, index) {
+        var parses = SVG.parsePoint('line', target.getAttribute('points'))
+        parses[index].x = x
+        parses[index].y = y
+        let data = (JOIN.generatePoints(parses))
+        target.setAttribute('points', data)
     }
-    static changePoly(idLists, target, opt){
+    static changePoly(idLists, target, opt) {
         var ids = [];
         if (idLists.includes(" ")) {
             var split = idLists.split(" ");
@@ -589,28 +671,28 @@ class JOIN {
         const rect = target.getBoundingClientRect()
         ids.forEach(id => {
             var t = i_id(id)
-            if(t == null) return
+            if (t == null) return
             var points = t.hasAttribute("points") ? t.getAttribute("points") : "";
             var connectorType = t.hasAttribute('data-connector') ?
                 t.getAttribute('data-connector') : "line"
             let newPdata = analysePath(rect, points, connectorType, opt)
             t.setAttribute("points", newPdata)
         })
-        function analysePath(rect, points, type, opt){
+        function analysePath(rect, points, type, opt) {
             const top = JOIN.getOffset(rect, 'top')
             const left = JOIN.getOffset(rect, 'left')
             let x = left - (rect.width / 2)
             let y = top - (rect.height / 2)
             return updatePos(x, y, type, points, opt)
         }
-        function updatePos(x, y, type, points, opt){
-            var parsePoints = SVG.parsePoint(type,points)
+        function updatePos(x, y, type, points, opt) {
+            var parsePoints = SVG.parsePoint(type, points)
             var start = parsePoints[0]
             var end = parsePoints[parsePoints.length - 1]
-            if(opt){
+            if (opt) {
                 start.x = x
                 start.y = y
-            }else{
+            } else {
                 end.x = x
                 end.y = y
             }
@@ -628,7 +710,7 @@ class JOIN {
         const rect = target.getBoundingClientRect()
         ids.forEach(id => {
             var t = document.getElementById(id)
-            if(t == null) return
+            if (t == null) return
             var path = t.hasAttribute("d") ? t.getAttribute("d") : "";
             var connectorType = t.hasAttribute('data-connector') ?
                 t.getAttribute('data-connector') : "line"
@@ -657,63 +739,81 @@ class JOIN {
             return p[0] + " " + p[1] + " " + p[2] + " " + sp[0] + " " + sp[1] + " " + sp[2];
         }
     }
-    static addBreakPoint(target, locx, locy){
-        var circle = new SVG().create('circle').attrNs({cx: locx,cy: locy, r: '3'}).attrs({stroke: '#333',"stroke-width":2,fill: '#d4d4d4',class: "_itech-circle-move-path"})
+    static addBreakPoint(target, locx, locy) {
+        var circle = new SVG().create('circle').attrNs({ cx: locx, cy: locy, r: '3' }).attrs({ stroke: '#333', "stroke-width": 2, fill: '#d4d4d4', class: "_itech-circle-move-path" })
         target.parentElement.appendChild(circle.svg)
+        var id = target.parentElement.id
         var parsePoints = SVG.parsePoint('line', target.getAttribute('points'))
         var x = locx
         var y = locy
-        
         var newP = {
             x: x,
             y: y
         }
-        
-        var opr = Calculator.generateNewPoint(parsePoints,newP)
+        var opr = Calculator.generateNewPoint(parsePoints, newP)
         var finalPointData = opr.data
-        itech('._itech-circle-move-path').loop(function(ele){
+        itech(`#${id} ._itech-circle-move-path`).loop(function (ele) {
             let index = parseInt(itech(ele).data('move-index'))
-            if(index >= opr.index){
-                ele.setAttribute("data-move-index",index + 1)
+            if (index >= opr.index) {
+                ele.setAttribute("data-move-index", index + 1)
             }
         })
-        circle.attrs({"data-move-index": opr.index})
+        circle.attrs({ "data-move-index": opr.index })
         let data = (JOIN.generatePoints(finalPointData))
-        target.setAttribute('points',data)
+        target.setAttribute('points', data)
         var movePath = true
         circle.svg.onmousedown = mouseDown
+        circle.svg.addEventListener('click', function (e) {
+            e.stopPropagation()
+            itech(this).toggleClass('_box_selected')
+        })
+        new Component(circle.svg).context([
+            {
+                name: "Remove", key: "Ctrl + P + Delete", callback: function (d) {
+                    var parses = SVG.parsePoint('line', target.getAttribute('points'))
+                    var mindex = parseInt(itech(circle.svg).data('move-index'))
+                    parses.splice(mindex, 1)
+                    let data = (JOIN.generatePoints(parses))
+                    target.setAttribute('points', data)
+                    itech(`#${id} ._itech-circle-move-path`).loop(function (ele) {
+                        let index = parseInt(itech(ele).data('move-index'))
+                        if (index >= mindex && index != 1) {
+                            ele.setAttribute("data-move-index", index - 1)
+                        }
+                    })
+                    d.target.remove()
+                }
+            }
+        ])
+
         var movex, movey
-        function mouseDown(e){
+        function mouseDown(e) {
+            e.stopPropagation()
             movePath = true
-            document.addEventListener('move',startMove)
+            document.addEventListener('move', startMove)
             document.addEventListener('up', endMove)
             console.log('down')
         }
-        function startMove(e){
-            console.log(movePath, 'moving')
-            if(!movePath) return false
+        function startMove(e) {
+            if (!movePath) return false
             e.stopPropagation()
             movex = e.pageX
             movey = e.pageY
-            var parses = SVG.parsePoint('line', target.getAttribute('points'))
             var index = parseInt(itech(circle.svg).data('move-index'))
-            parses[index].x = movex
-            parses[index].y = movey
-            let data = (JOIN.generatePoints(parses))
-            target.setAttribute('points',data)
-            circle.attrNs({cx: movex, cy: movey})
+            JOIN.updateJoinsByC(movex, movey, target, index)
+            circle.attrNs({ cx: movex, cy: movey })
         }
-        function endMove(){
-            if(!movePath) return false
+        function endMove() {
+            if (!movePath) return false
             movePath = false
         }
     }
-    static generatePoints(point = [{x:0,y:0}]){
+    static generatePoints(point = [{ x: 0, y: 0 }]) {
         let pointData = ``
-        for(let p of point){
+        for (let p of point) {
             pointData += `${p.x} ${p.y}, `
         }
-        return pointData.trim().substring(0,pointData.length - 2)
+        return pointData.trim().substring(0, pointData.length - 2)
     }
 }
 
@@ -732,8 +832,8 @@ class SVG {
         this.svg = document.createElementNS(SVG.xsvg, SVG.xlink, "#" + tag);
         return this;
     }
-    style(style){
-        if(this.svg == null) return
+    style(style) {
+        if (this.svg == null) return
         var defs = i_create('defs');
         var sty = i_create('style')
         sty.type = "text/css"
@@ -753,7 +853,7 @@ class SVG {
     }
     attrs(attrs) {
         for (let key in attrs) {
-            if(this.svg.getAttribute(key)){
+            if (this.svg.getAttribute(key)) {
                 this.svg.removeAttribute(key)
             }
             this.svg.setAttribute(key, attrs[key])
@@ -768,108 +868,108 @@ class SVG {
         return path
     }
 
-    polyline(points, css){
-        var poly = new SVG().create('polyline').attrNs({ "stroke": css.color, fill: "none","stroke-width": css.size, "points": points })
+    polyline(points, css) {
+        var poly = new SVG().create('polyline').attrNs({ "stroke": css.color, fill: "none", "stroke-width": css.size, "points": points })
         this.svg.appendChild(poly.svg)
         return poly
     }
 
-    static addGeneralAction(svgelement){
-        svgelement.addEventListener('dblclick',function(e){
+    static addGeneralAction(svgelement) {
+        svgelement.addEventListener('dblclick', function (e) {
             JOIN.addBreakPoint(this, e.pageX, e.pageY)
         })
     }
 
-    static addPathAction(svg,...targets){
-        var polyline = null, pointData = {x1:0,y1:0,x2:0,y2:0};
-        targets.forEach(target=>{
-            target.addEventListener('mousedown',function(e){
+    static addPathAction(svg, ...targets) {
+        var polyline = null, pointData = { x1: 0, y1: 0, x2: 0, y2: 0 };
+        targets.forEach(target => {
+            target.addEventListener('mousedown', function (e) {
                 e.stopPropagation();
-                start(e,this)
+                start(e, this)
             })
         })
         var drawLivePath = false, dragTarget = null
-        function start(e,target){
+        function start(e, target) {
             var rect = target.getBoundingClientRect();
             dragTarget = target
-            
-            var connector =JSON.parse(target.dataset['join_connector_setting'])
+
+            var connector = JSON.parse(target.dataset['join_connector_setting'])
             var g = new SVG().create('g')
-            g.svg.id = 'g_'+createId('gp')
+            g.svg.id = 'g_' + createId('gp')
             pointData.x1 = rect.left + (rect.width / 2)
             pointData.y1 = rect.top + (rect.height / 2)
             pointData.x2 = e.pageX
             pointData.y2 = e.pageY
-            polyline = g.polyline(pointDatas(),connector).attrs({"data-svg-g": g.svg.id,class: "-svg-itech-path"})
+            polyline = g.polyline(pointDatas(), connector).attrs({ "data-svg-g": g.svg.id, class: "-svg-itech-path itech-connector-obj" })
             g.svg.appendChild(polyline.svg)
             SVG.addGeneralAction(polyline.svg)
             svg.svg.appendChild(g.svg)
             new Component(polyline.svg).context([
                 {
-                    name: "Add Point", key: "Ctrl + Alt + P", callback:function (d) {
-                        JOIN.addBreakPoint(d.target,d.x,d.y)
+                    name: "Add Point", key: "Ctrl + Alt + P", callback: function (d) {
+                        JOIN.addBreakPoint(d.target, d.x, d.y)
                     }
                 },
                 {
-                    name: "Style", key: "Ctrl + Alt + S", callback:function (data) {
+                    name: "Style", key: "Ctrl + Alt + S", callback: function (data) {
                         console.log(data)
                     }
                 },
                 {
-                    name: "Delete", key: "", callback:function (data) {
+                    name: "Delete", key: "", callback: function (data) {
                         SVG.removePath(data.target)
                     }
                 }
             ])
-            document.body.css({cursor: "crosshair"})
+            document.body.css({ cursor: "crosshair" })
             drawLivePath = true
             document.onmousemove = drag
             document.onmouseup = stop
         }
-        function drag(e){
-            if(!drawLivePath) return false
+        function drag(e) {
+            if (!drawLivePath) return false
             pointData.x2 = e.pageX
             pointData.y2 = e.pageY
-            polyline.attrs({points: pointDatas()})
+            polyline.attrs({ points: pointDatas() })
         }
-        function stop(e){
-            if(!drawLivePath) return false
+        function stop(e) {
+            if (!drawLivePath) return false
             drawLivePath = false
-            document.body.css({cursor: "default"})
+            document.body.css({ cursor: "default" })
             updateJoin(dragTarget, e.target, polyline)
         }
-        
-        function pointDatas(){
+
+        function pointDatas() {
             return `${pointData.x1} ${pointData.y1}, ${pointData.x2} ${pointData.y2}`;
         }
-        function updateJoin(current,target,path){
-            if(!current.classList.contains('_join_component') ||
-            !target.classList.contains('_join_component') ||
-            current.parentElement == target.parentElement){
+        function updateJoin(current, target, path) {
+            if (!current.classList.contains('_join_component') ||
+                !target.classList.contains('_join_component') ||
+                current.parentElement == target.parentElement) {
                 polyline.svg.parentElement.remove()
                 return false
-            } 
+            }
             var id = "p_" + current.parentElement.id + "-" + target.parentElement.id;
             path.svg.id = id
-            JOIN.addRelationRef(id,current,true)
-            JOIN.addRelationRef(id,target,false)
+            JOIN.addRelationRef(id, current, true)
+            JOIN.addRelationRef(id, target, false)
         }
     }
 
-    static removePath(path){
+    static removePath(path) {
         var id = path.id;
         JOIN.removeRelated(id);
         path.parentElement.remove();
     }
 
-    static parsePoint(type = 'line', point){
+    static parsePoint(type = 'line', point) {
         var data = []
-        if(type=='line'){
+        if (type == 'line') {
             let points = point.trim().split(',')
-            for(let p of points){
+            for (let p of points) {
                 p = p.trim()
                 let obj = {
-                    x:0,y:0
+                    x: 0, y: 0
                 }
                 let xy = p.trim().split(/\s/g)
                 obj.x = parseInt(xy[0].trim())
@@ -879,7 +979,7 @@ class SVG {
         }
         return data
     }
-    
+
     static parsePath(type, path) {
         if (type == 'line') {
             const symbols = ['M', 'L']

@@ -187,10 +187,16 @@ body * {
 }
 /* colors */
 .c-primary{
-  color: #42b883;
+  color: #FD841F;
 }
 .c-secondary{
-  color: aqua;
+  color: #E14D2A;
+}
+.c-col1{
+  color: #CD104D;
+}
+.c-col2{
+  color: #9C2C77;
 }
 .c-black{
   color: #333;

@@ -16,7 +16,8 @@
             <div class="main-menu-field">
                 <ul class="header-menu">
                     <li class="main-list"><i class="fas fa-mouse-pointer icon"></i></li>
-                    <li class="main-list" data-hide="#r-line"><i class="fas fa-slash icon"></i>
+                    <li class="main-list"><i class="far fa-object-group icon"></i></li>
+                    <li class="main-list" tabindex="-1" data-hide="#r-line"><i class="fas fa-slash icon"></i>
                         <div class="menu-ref-box line" id="r-line">
                             <span class="r ref-line flex center"><i class="fas fa-slash"></i></span>
                             <span class="r ref-line flex center"><img src="img/curve-ico.svg" alt="" class="img"></span>
@@ -24,20 +25,35 @@
                         </div>
                     </li>
                     <li class="main-list" id="add-comp-btn"><i class="fas fa-square icon"></i></li>
-                    <li class="main-list" data-hide="#r-color"><i class="fas fa-tint icon"></i>
+                    <li class="main-list" tabindex="-1" data-hide="#r-color"><i class="fas fa-tint icon"></i>
                         <div class="menu-ref-box line" id="r-color">
-                            <span class="r ref-line flex center"><i class="fas fa-square x-2x c-primary"></i></span>
-                            <span class="r ref-line flex center"><i class="fas fa-square x-2x c-secondary"></i></span>
-                            <span class="r ref-line flex center"><i class="fas fa-square x-2x c-black"></i></span>
-                            <span class="r ref-line flex center"><i class="fas fa-square x-2x c-white"></i></span>
-                            <span class="r ref-line flex center" data-click="#choose-tink-color">
+                            <span class="r ref-line flex center choose-c-color" data-color="#FD841F"><i class="fas fa-square x-2x c-primary"></i></span>
+                            <span class="r ref-line flex center choose-c-color" data-color="#E14D2A"><i class="fas fa-square x-2x c-secondary"></i></span>
+                            <span class="r ref-line flex center choose-c-color" data-color="#CD104D"><i class="fas fa-square x-2x c-col1"></i></span>
+                            <span class="r ref-line flex center choose-c-color" data-color="#9C2C77"><i class="fas fa-square x-2x c-col2"></i></span>
+                            <span class="r ref-line flex center choose-c-color" data-color="#333"><i class="fas fa-square x-2x c-black"></i></span>
+                            <span class="r ref-line flex center choose-c-color" data-color="#FFF"><i class="fas fa-square x-2x c-white"></i></span>
+                            <span class="r ref-line flex center choose-c-color ref" data-color="#000" data-click="#choose-tink-color">
                                 <i class="fas fa-palette c-hash"></i>
-                                <input type="color" id="choose-tink-color">
+                                <input type="color" class="pop-c" id="choose-tink-color">
                             </span>
                         </div>
                     </li>
-                    <li class="main-list"><i class="fas fa-fill-drip icon"></i></li>
-                    <li class="main-list"><i class="fas fa-tools icon"></i></li>
+                    <li class="main-list" tabindex="-1" data-hide="#rb-color"><i class="fas fa-fill-drip icon"></i>
+                        <div class="menu-ref-box line" id="rb-color">
+                            <span class="r ref-line flex center"><i class="fas fa-square x-2x c-primary"></i></span>
+                            <span class="r ref-line flex center"><i class="fas fa-square x-2x c-secondary"></i></span>
+                            <span class="r ref-line flex center"><i class="fas fa-square x-2x c-col1"></i></span>
+                            <span class="r ref-line flex center"><i class="fas fa-square x-2x c-col2"></i></span>
+                            <span class="r ref-line flex center"><i class="fas fa-square x-2x c-black"></i></span>
+                            <span class="r ref-line flex center"><i class="fas fa-square x-2x c-white"></i></span>
+                            <span class="r ref-line flex center" data-click="#choose-bg-color">
+                                <i class="fas fa-palette c-hash"></i>
+                                <input type="color" id="choose-bg-color">
+                            </span>
+                        </div>
+                    </li>
+                    
                 </ul>
             </div>
             <button class="float-btn">
