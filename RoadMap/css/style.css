@@ -112,6 +112,30 @@ circle._box_selected{
   background-color: #FFF;
   border-radius: 5px;
   box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+  animation: drop .5s 1;
+}
+.modal-box.up{
+  animation: up .5s 1;
+}
+@keyframes up {
+  from{
+    opacity: 1;
+    top: 50%;
+  }
+  to{
+    opacity: 0;
+    top: 40%;
+  }
+}
+@keyframes drop {
+  from{
+    opacity: 0;
+    top: 40%;
+  }
+  to{
+    opacity: 1;
+    top: 50%;
+  }
 }
 .modal-head{
   padding: 10px;
@@ -169,9 +193,11 @@ circle._box_selected{
 .color-picker .color-tool:hover::before{
   color: #0181a7;
 }
-.color-picker .color-inp{
+.color-inp{
   width: 0;
+  height: 0;
   opacity: 0;
+  pointer-events: none;
 }
 .context-menu-list *{
   cursor: pointer;
@@ -192,4 +218,89 @@ svg path{
 }
 .tint-color *:hover{
   cursor: inherit !important;
+}
+.small-field{
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+.small-field .inp{
+  width: 45%;
+}
+.small-field .btn{
+  background-color: transparent;
+  color: #333;
+  width: fit-content;
+  height: fit-content;
+  padding: 3px;
+}
+.small-field .btn:hover,
+.small-field .btn.active{
+  color: #6019f6;
+}
+.small-field .color-picker{
+  width: 45% !important;
+}
+.small-field .color-picker .inp{
+  width: 100%;
+}
+.label{
+  text-align: left;
+  width: 100%;
+  margin: 0;
+  font-size: 13px;
+  color: #877d7d;
+}
+.border-direction{
+  justify-content: start;
+  width: fit-content;
+  overflow: hidden;
+  
+}
+.border-direction .b,
+.border-direction .color-r{
+  width: 30px;
+  height: 30px;
+  justify-content: center;
+  border-radius: 5px;
+  border: 2px solid #877d7d;
+  margin: 2px;
+  cursor: pointer;
+  align-items: center;
+}
+.border-direction .b:hover{
+  background-color: #7e7e7e70;
+}
+
+.border-direction .b.active{
+  background-color: #000000a2;
+}
+.border-direction .b i{
+  line-height: 0.5;
+}
+.b.left{
+  justify-content: start;
+}
+.b.left i{
+  transform: rotateZ(90deg);
+}
+.b.top{
+  align-items: flex-start;
+}
+.b.right{
+  justify-content: end;
+}
+.b.right i{
+  transform: rotateZ(90deg);
+}
+.b.bottom{
+  align-items: flex-end;
+}
+.normal-f .inp{
+  width: 45%;
+}
+.normal-f .inp.size{
+  width: 90px;
+  margin: 0 5px;
 }

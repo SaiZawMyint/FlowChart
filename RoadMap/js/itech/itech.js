@@ -91,15 +91,26 @@ window.itech = function (selector) {
         object: function (obj) {
             return new FObject(selected).filterObject(obj);
         },
-        show: function (cmd = "block") {
+        show: function (cmd = "block",callback) {
             command(function (ele) {
                 ele.style.display = cmd;
+                callback(ele)
             });
+            
         },
-        hide: function () {
-            command(function (ele) {
-                ele.style.display = "none";
-            });
+        hide: function (callback) {
+            if(selected instanceof Element){
+                selected.style.display = "none"
+                if(callback != null || callback != undefined)
+                callback(selected)
+            }else{
+                command(function (ele) {
+                    ele.style.display = "none";
+                    if(callback != null || callback != undefined)
+                    callback(ele)
+                });
+            }
+            
         },
         toggleShow: function (cmd) {
             const current = this;
@@ -170,18 +181,24 @@ window.itech = function (selector) {
             return res
         },
         color: function (color) {
-            return generateLightOrDarkColor(color);
+            return{
+                convertHEX: function(){
+                    return Color.convertHex(color)
+                }
+            }
         },
         loop: function (callback) {
             [].forEach.call(selected, callback);
         },
-        data: function (data) {
+        data: function (data,val = null) {
             var x;
             if (selected instanceof Element) {
+                if(val != null || val != undefined) selected.setAttribute(`data-${data}`,val)
                 x = selected.getAttribute(`data-${data}`);
             } else {
                 x = [];
                 command(function (ele) {
+                    if(val != null || val != undefined) ele.setAttribute(`data-${data}`,val)
                     x.push(ele.getAttribute(`data-${data}`));
                 });
             }
@@ -209,6 +226,29 @@ window.itech = function (selector) {
             if(selected instanceof Element){
                 if(val == null || val == undefined) return selected.getAttribute(attr)
             }
+        },
+        animate: function(action){
+            if(selected instanceof Element){
+
+            }
+        },
+        wait: function(time,action,callback){
+            let id = null
+            let p = 0
+            clearInterval(id)
+            action()
+            id = setInterval(function(){
+                if(p==time){
+                    clearInterval(id)
+                    command(function(ele){
+                        callback(ele)
+                    })
+                }
+                
+                p++
+            },time)
+           
+            
         },
         get: function (index) {
             if (index != null) return selected[index];
@@ -254,8 +294,9 @@ class Design {
             cursor: "pointer",
             top: "10px",
             left: "50%",
-            transform: "translateX(-50%)",
-            display: "block",
+            display: "flex",
+            "align-items":"center",
+            "justify-content": "center",
             position: "absolute",
             opacity: "1",
         },
@@ -315,6 +356,25 @@ class Design {
         ctx.fillText(code, 7, 7);
         var dataURL = canvas.toDataURL('image/png')
         return dataURL
+    }
+}
+
+class Color{
+    static componentToHex(c) {
+        var hex = c.toString(16);
+        return hex.length == 1 ? "0" + hex.toUpperCase() : hex.toUpperCase();
+    }
+    static rgbToHex(r, g, b) {
+        return "#" + Color.componentToHex(r) + Color.componentToHex(g) + Color.componentToHex(b);
+    }
+    static convertHex(color){
+        var c = ""
+        if(color.includes('rgb')){
+            var crange = color.substring(color.indexOf('(')+1, color.lastIndexOf(')'));
+            var rgb = crange.split(',')
+            c = Color.rgbToHex(parseInt(rgb[0].trim()),parseInt(rgb[1].trim()),parseInt(rgb[2].trim()))
+        }
+        return c
     }
 }
 
@@ -530,6 +590,29 @@ class Calculator {
         pointdata +=(" L " + process.argv[lastArg - 1] + "," + process.argv[lastArg]+" Z");
         return pointdata
     }
+    static getFirst(value='',regex, data =[]){
+        var splits = value.split(regex)
+        var match = ''
+        for(let sp of splits){
+            if(data.includes(sp)){
+                match = sp
+                break;
+            }
+        }
+        return match
+    }
+    static largetInt(value='',regex=' '){
+        if(!value.includes(regex)) return parseInt(value)
+        var splits = value.split(regex)
+        var match = 0
+        for(let sp of splits){
+            let x = parseInt(sp.trim())
+            if(match < x){
+                match = x
+            }
+        }
+        return match
+    }
 }
 
 var x = 0;
@@ -595,6 +678,17 @@ class FObject {
         let ary = Object.entries(newObj);
         let x = ary.filter(([key, value]) => key != "filterObject");
         return Object.fromEntries(x);
+    }
+}
+class IAnimation{
+    static animate(element=new Element(),action){
+        switch(action){
+            case 'drop-down': dropdown()
+                break;
+        }
+        function dropdown(){
+            
+        }
     }
 }
 var itechEvent = new IEvent();

@@ -375,7 +375,7 @@ class Component {
         return this;
     }
     addText(text) {
-        this.component.innerHTML = `<span style="user-select:none;color:inherit;" class="_itech_fc_text">${text}</span>`;
+        this.component.innerHTML = `<span style="user-select:none;color:inherit;font-family:inherit;font-size: inherit;" class="_itech_fc_text">${text}</span>`;
         var target = this.component
         this.component.firstElementChild.addEventListener('focus', function (e) {
             e.stopPropagation();
@@ -384,6 +384,9 @@ class Component {
             console.log(prevents.component.isRename)
         })
         this.component.firstElementChild.addEventListener('input', function () {
+            JOIN.searchJoins(target);
+        })
+        this.component.firstElementChild.addEventListener('change', function () {
             JOIN.searchJoins(target);
         })
         this.component.firstElementChild.addEventListener('mousedown', function (e) {
@@ -492,7 +495,7 @@ class Component {
             //calculate position
             JOIN.searchJoins(elmnt)
             elmnt.style.top = ((e.pageY - elmnt.offsetTop) + (elmnt.offsetTop - (elmnt.offsetHeight / 2))) + "px";
-            elmnt.style.left = ((e.pageX - elmnt.offsetLeft) + (elmnt.offsetLeft)) + "px";
+            elmnt.style.left = ((e.pageX - elmnt.offsetLeft) + (elmnt.offsetLeft - (elmnt.offsetWidth / 2))) + "px";
             restoreHoverProps(elmnt.style.top, elmnt.style.left)
         }
 

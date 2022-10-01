@@ -68,12 +68,98 @@
             </div> -->
             
         </div>
+        <div class="stylish-box flex flex-column">
+            <div class="forms flex center flex-column">
+                <div class="label">Component Name</div>
+                <div class="inp-field w-100">
+                    <input type="text" id="ref-comp-name" class="inp blame" placeholder="Component's Name">
+                </div>
+            </div>
+            <div class="forms flex flex-column center">
+                <div class="label">Positions & Sizings</div>
+                <div class="flex small-field">
+                    <input type="number" min="0" id="ref-comp-top" class="inp" placeholder="Top">
+                    <button class="btn lock" id="position-lock"><i class="fas lock-ico"></i></button>
+                    <input type="number" min="0" name="" id="ref-comp-left" class="inp" placeholder="Left">
+                </div>
+                <div class="flex small-field my-1">
+                    <div class="color-picker flex">
+                        <input type="number" min="0" name="" id="ref-comp-width" class="inp" placeholder="Width">
+                        <div class="color-tool fas fa-eject" id="auto-width"></div>
+                    </div>
+                    <button class="btn lock" id="size-lock"><i class="fas lock-ico"></i></button>
+                    <div class="color-picker flex">
+                        <input type="number" min="0" name="" id="ref-comp-height" class="inp" placeholder="Height">
+                        <div class="color-tool fas fa-eject" id="auto-height"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="forms flex flex-column center">
+                <div class="label">Colors</div>
+                <div class="flex small-field">
+                    <div class="color-picker flex">
+                        <input type="text" id="ref-comp-color" class="inp" value="#FFFFFF" placeholder="Color">
+                        <div class="color-tool fas fa-fill-drip color-dig" id="ref-f-color">
+                            <input type="color" id="ref-fore-color" class="color-inp" data-color="#ref-comp-color">
+                        </div>
+                    </div>
+                    <!-- <button class="btn lock"><i class="fas fa-unlock"></i></button> -->
+                    <div class="color-picker flex">
+                        <input type="text" id="ref-comp-bg-color" class="inp" value="#FFFFFF" placeholder="Background">
+                        <div class="color-tool fas fa-fill-drip color-dig" id="ref-b-color">
+                            <input type="color" id="ref-back-color" class="color-inp" data-color="#ref-comp-bg-color">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="forms flex flex-column center">
+                <div class="label">Fonts</div>
+                <div class="flex small-field">
+                    <select name="" id="ref-font-family" class="inp">
+                        <option value="0">Font Family</option>
+                        <option value="system" style="font-family: 'system';">Popin Regular</option>
+                        <option value="alkalami" style="font-family: 'alkalami';">Alkalami</option>
+                        <option value="dancingscipt" style="font-family: 'dancingscipt';">Dancing Script</option>
+                        <option value="natosanmono" style="font-family: 'natosanmono';">Natosan Mono</option>
+                        <option value="passionsconflict" style="font-family: 'passionsconflict';">Passions Conflict</option>
+                        <option value="roboto" style="font-family: 'roboto';">Roboto</option>
+                    </select>
+                    <input type="number" min="0" name="" id="ref-font-size" class="inp" placeholder="Size">
+                </div>
+            </div>
+            <div class="forms flex flex-column">
+                <div class="label">Border</div>
+                <div class="flex small-field border-direction">
+                    <div class="b left flex"  id="ref-border-left" data-direction="left"><i class="fas fa-minus"></i></div>
+                    <div class="b top flex" id="ref-border-top" data-direction="top"><i class="fas fa-minus"></i></div>
+                    <div class="b bottom flex"  id="ref-border-bottom" data-direction="bottom"><i class="fas fa-minus"></i></div>
+                    <div class="b right flex"  id="ref-border-right" data-direction="right"><i class="fas fa-minus"></i></div>
+                    <div class="color-r flex center" id="ref-border-color" data-direction="ref-border-color-inp">
+                        <i class="fas fa-palette"></i>
+                        <input type="color" class="color-inp" id="ref-border-color-inp" data-color="#ref-border-color">
+                    </div>
+                </div>
+                <div class="flex normal-f my-1">
+                    <select name="" id="ref-border-type" class="inp">
+                        <option value="solid">Solid</option>
+                        <option value="dotted">Dotted</option>
+                        <option value="dashed">Dashed</option>
+                        <option value="double">Double</option>
+                        <option value="groove">Groove</option>
+                        <option value="ridge">Ridge</option>
+                        <option value="inset">Inset</option>
+                        <option value="outset">Outset</option>
+                    </select>
+                    <input type="number" min="0" name="" id="ref-border-size" class="inp size" placeholder="Size">
+                </div>
+            </div>
+        </div>
         <!-- /.contents -->
         <footer class="footer"></footer>
         <!-- /.footer -->
     </div>
     <!-- /.wrapper -->
-    <div class="modal-field">
+    <div class="modal-field hide">
         <div class="modal-box flex flex-column">
             <div class="modal-head">Add Component</div>
             <div class="modal-body flex flex-column">
@@ -83,12 +169,6 @@
                     </div>
                     
                 </div>
-                <!-- <div class="forms flex center">
-                    <div class="inp-field">
-                        <input type="text" id="comp-id" class="inp" placeholder="Component's ID">
-                    </div>
-                    
-                </div> -->
                 <div class="forms flex center">
                     <div class="inp-field">
                         <input type="number" id="comp-top" class="inp small" min="0" placeholder="Top">

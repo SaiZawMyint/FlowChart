@@ -3,6 +3,36 @@
   src: url('../font/Poppins-Regular.ttf');
   font-weight: normal;
 }
+@font-face {
+  font-family: 'alkalami';
+  src: url('../font/Alkalami-Regular.ttf');
+  font-weight: normal;
+}
+@font-face {
+  font-family: 'dancingscipt';
+  src: url('../font/DancingScript-VariableFont_wght.ttf');
+  font-weight: normal;
+}
+@font-face {
+  font-family: 'kanit';
+  src: url('../font/Kanit-Regular.ttf');
+  font-weight: normal;
+}
+@font-face {
+  font-family: 'natosanmono';
+  src: url('../font/NotoSansMono-VariableFont_wdth.ttf');
+  font-weight: normal;
+}
+@font-face {
+  font-family: 'passionsconflict';
+  src: url('../font/PassionsConflict-Regular.ttf');
+  font-weight: normal;
+}
+@font-face {
+  font-family: 'roboto';
+  src: url('../font/Roboto-Regular.ttf');
+  font-weight: normal;
+}
 :focus{
   border: 0;
   outline: 0;
@@ -11,7 +41,9 @@ body,
 body * {
   font-family: 'system';
 }
-
+body{
+  overflow: hidden;
+}
 * {
   margin: 0;
   padding: 0;
@@ -48,7 +80,13 @@ body * {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 500;
+  width: fit-content;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.content{
+  position: relative;
 }
 .logo{
   font-size: 25px;
@@ -206,4 +244,42 @@ body * {
 }
 .c-hash{
   color: #d4d4d4;
+}
+.c-main{
+  color: #16616bcd;
+}
+
+/* stylish box */
+.stylish-box{
+  position: absolute;
+  width: 350px;
+  height: 95%;
+  background-color: #d4d4d4;
+  border-radius: 5px;
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.2);
+  top: 50%;
+  left: calc(100% + 5px);
+  transform: translateY(-50%);
+  z-index: 505;
+  padding: 10px;
+  opacity: 0;
+  transition: left .3s ease-in, opacity .5s ease-in;
+}
+.stylish-box.active{
+  left: calc(100% - 355px);
+  opacity: 1;
+}
+/* width */
+.w-80{
+  width: 80% !important;
+}
+.w-100{
+  width: 100% !important;
+}
+/* icon */
+.lock-ico::before{
+  content: '\f09c';
+}
+.lock.active .lock-ico::before{
+  content: '\f023';
 }
